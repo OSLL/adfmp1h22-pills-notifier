@@ -1,4 +1,4 @@
-package com.example.helloworld
+package com.example.pillnotifier
 
 import org.junit.Test
 
