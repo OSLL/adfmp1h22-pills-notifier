@@ -6,4 +6,6 @@
     <string name="close">Close</string>
     <string name="username">Sherlock Holmes</string>
     <string name="link">\u0040great_detective</string>
+    <string name="notification">Kimberly White didn\'t take Vitamin A</string>
+    <string name="date">7 February at 15:40</string>
 </resources>

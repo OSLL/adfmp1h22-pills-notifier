@@ -28,8 +28,12 @@ class Settings : AppCompatActivity() {
             name = nameInput?.text.toString()
             link = linkInput?.text.toString()
             val intent = Intent()
-            intent.putExtra("username", name)
-            intent.putExtra("link", link)
+            if (name != null && name != "") {
+                intent.putExtra("username", name)
+            }
+            if (link != null && link != "") {
+                intent.putExtra("link", link)
+            }
             setResult(Activity.RESULT_OK, intent)
             onBackPressed()
         }

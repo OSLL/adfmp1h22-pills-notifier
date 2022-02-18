@@ -3,11 +3,10 @@ package com.example.pillnotifier
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
-import androidx.activity.result.ActivityResultCallback
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -81,6 +80,15 @@ class MainActivity : AppCompatActivity() {
         if (mToggle.onOptionsItemSelected(item)) {
             return true
         }
+        val id = item.itemId
+        if (id == R.id.notification) {
+            activityWithResult.launch(Intent(applicationContext, Notification::class.java))
+        }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.app_bar_menu, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 }
