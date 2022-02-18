@@ -5,10 +5,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.example.pillnotifier.R
+import com.example.pillnotifier.adapters.MedicineAdapter
+import com.example.pillnotifier.model.Medicine
+import com.example.pillnotifier.model.MedicineTake
+import com.example.pillnotifier.model.Regularity
+import java.util.*
 
 class MedicineFragment : Fragment() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
