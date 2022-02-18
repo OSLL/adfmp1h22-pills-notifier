@@ -1,13 +1,20 @@
 package com.example.pillnotifier
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.viewpager2.widget.ViewPager2
 import com.example.pillnotifier.adapters.ViewPagerAdapter
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -16,7 +23,21 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mToggle: ActionBarDrawerToggle
-    private lateinit var mToolBar: Toolbar
+
+    private val activityWithResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                if (result.data?.hasExtra("username") == true) {
+                    val username = findViewById<View>(R.id.username) as TextView
+                    username.text = result.data!!.extras?.getString("username")
+                }
+                if (result.data?.hasExtra("link") == true) {
+                    val link = findViewById<View>(R.id.link) as TextView
+                    link.text = result.data!!.extras?.getString("link")
+                }
+            }
+        }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +64,16 @@ class MainActivity : AppCompatActivity() {
         mToggle.syncState()
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        val mNavigationView = findViewById<View>(R.id.nav_menu) as NavigationView
+        mNavigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.edit_profile -> {
+                    activityWithResult.launch(Intent(applicationContext, Settings::class.java))
+                }
+            }
+            true
+        }
     }
 
     @Override
