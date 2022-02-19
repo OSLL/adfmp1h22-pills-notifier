@@ -26,6 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:background="@color/purple_500"
+            app:tabTextColor="@color/purple_200"
             android:contentDescription="@string/hello_blank_fragment"
             app:tabGravity="fill"
             app:tabIndicatorColor="@color/purple_200"
