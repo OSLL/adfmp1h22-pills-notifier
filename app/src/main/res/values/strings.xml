@@ -8,4 +8,9 @@
     <string name="link">\u0040great_detective</string>
     <string name="notification">Kimberly White didn\'t take Vitamin A</string>
     <string name="date">7 February at 15:40</string>
+    <string name="medicine_name_example">Vitamin A</string>
+    <string name="medicine_portion_example">4 pills</string>
+    <string name="take_time_example">08:00</string>
+    <string name="user_name_example">Kimberly White</string>
+    <string name="nickname_example">\@kwhite</string>
 </resources>

@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import com.example.pillnotifier.R
 
 class MedicineFragment : Fragment() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
