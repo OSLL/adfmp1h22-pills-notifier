@@ -10,9 +10,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PillNotifier">
         <activity
-            android:name=".Notification"
+            android:name=".MedicineProfile"
             android:exported="false"
             android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".Notification"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".Settings"
             android:exported="false" />
