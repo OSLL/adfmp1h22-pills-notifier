@@ -5,9 +5,41 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.Toast
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
 import com.example.pillnotifier.R
+import com.example.pillnotifier.adapters.ProfileAdapter
+import com.example.pillnotifier.adapters.ProfileAdapterCreator
+import com.example.pillnotifier.adapters.ProfilesListAdapter
+import com.example.pillnotifier.adapters.holders.AbstractProfileViewHolder
+import com.example.pillnotifier.adapters.holders.RemovableProfileHolder
+import com.example.pillnotifier.adapters.holders.SimpleProfileHolder
+import com.example.pillnotifier.model.Profile
+import com.example.pillnotifier.model.ProfilesList
 
 class ExploreFragment : Fragment() {
+    // TODO in the future change SimpleProfileHolder to other implementations of AbstractProfileViewHolder
+    private val profilesListWithAdaptCreators =
+        mutableListOf<Pair<ProfilesList, ProfileAdapterCreator<AbstractProfileViewHolder>>>(
+            Pair(ProfilesList("Dependents", listOf(
+                    Profile("Sarah Gallagher", "sgallagher"),
+                ))){c, pl -> ProfileAdapter(c, pl, R.layout.removable_user_list_item){ v -> SimpleProfileHolder(v) } },
+
+            Pair(ProfilesList("Observers", listOf(
+                    Profile("Sarah Gallagher", "sgallagher"), Profile("Anna Smith", "asmith")
+                ))){c, pl -> ProfileAdapter(c, pl, R.layout.removable_user_list_item){ v -> SimpleProfileHolder(v) } },
+
+            Pair(ProfilesList("Incoming requests", listOf(
+                    Profile("Kimberly White", "kwhite")
+            ))){c, pl -> ProfileAdapter(c, pl, R.layout.incoming_request_item){ v -> SimpleProfileHolder(v) } },
+
+            Pair(ProfilesList("Outgoing requests", listOf(
+                Profile("Jane Thompson", "jthompson")
+            ))){c, pl -> ProfileAdapter(c, pl, R.layout.outgoing_request_item){ v -> SimpleProfileHolder(v) } },
+            )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,8 +49,24 @@ class ExploreFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_explore, container, false)
+        val view = inflater.inflate(R.layout.fragment_explore, container, false)
+
+        val recyclerView: RecyclerView = view.findViewById(R.id.profiles_lists_rv)
+        recyclerView.adapter = ProfilesListAdapter(requireContext(), profilesListWithAdaptCreators)
+        recyclerView.addItemDecoration(
+            DividerItemDecoration(
+                recyclerView.context,
+                DividerItemDecoration.VERTICAL
+            )
+        )
+
+        val dependentInput: EditText = view.findViewById(R.id.dependent_input)
+        val searchIV: ImageView = view.findViewById(R.id.search_iv)
+        searchIV.setOnClickListener{ v ->
+            Toast.makeText(context, "Not found user @${dependentInput.text}", Toast.LENGTH_LONG).show()
+        }
+
+        return view
     }
 
 }

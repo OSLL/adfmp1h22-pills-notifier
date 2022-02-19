@@ -18,7 +18,7 @@
         android:id="@+id/user_name_and_nickname_ll"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="60"
+        android:layout_weight="75"
         android:orientation="vertical">
 
         <TextView

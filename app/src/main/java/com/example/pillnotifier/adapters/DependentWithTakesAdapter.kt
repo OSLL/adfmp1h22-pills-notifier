@@ -21,12 +21,11 @@ class DependentWithTakesAdapter(
         return DependentWithTakesAdapter.ViewHolder(view)
     }
 
-
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val dependentWithTakes = dependentsWithTakes[position]
 
-        holder.userNameTV.text = dependentWithTakes.name
-        holder.userNicknameTV.text = "@" + dependentWithTakes.nickname
+        holder.userNameTV.text = dependentWithTakes.dependentProfile.name
+        holder.userNicknameTV.text = "@" + dependentWithTakes.dependentProfile.nickname
 
         holder.dependentScheduleRV.adapter =
             MedicineTakeAdapter(context, dependentWithTakes.medicineTakes, Rights.READ)
@@ -52,9 +51,7 @@ class DependentWithTakesAdapter(
         })
     }
 
-    override fun getItemCount(): Int {
-        return dependentsWithTakes.size
-    }
+    override fun getItemCount(): Int = dependentsWithTakes.size
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val userNameTV: TextView
