@@ -13,4 +13,10 @@
     <string name="take_time_example">08:00</string>
     <string name="user_name_example">Kimberly White</string>
     <string name="nickname_example">\@kwhite</string>
+    <string name="user_list_name_example">Dependents</string>
+    <string name="user_list_size_example">2 people</string>
+    <string name="remove">Remove</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="withdraw">Withdraw</string>
 </resources>

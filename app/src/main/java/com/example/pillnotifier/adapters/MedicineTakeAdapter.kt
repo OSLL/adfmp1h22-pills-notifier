@@ -18,7 +18,7 @@ enum class Rights {
     WRITE
 }
 
-class MedicineTakeAdapter(
+class MedicineTakeAdapter (
     private val context: Context,
     private val medicines: List<MedicineTake>,
     private val rights: Rights

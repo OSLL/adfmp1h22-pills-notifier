@@ -24,8 +24,7 @@ class DependentsFragment : Fragment() {
         medicineTakeList.add(MedicineTake(medicine, date, TakeStatus.UNKNOWN))
 
         val dependentWithTakes = DependentWithTakes(
-            "Kimberly White",
-            "kwhite",
+            Profile("Kimberly White", "kwhite"),
             medicineTakeList
         )
         for (i in 1..2)
