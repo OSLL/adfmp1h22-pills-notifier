@@ -9,10 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pillnotifier.R
-import com.example.pillnotifier.adapters.MedicineAdapter
+import com.example.pillnotifier.adapters.MedicineTakeAdapter
+import com.example.pillnotifier.adapters.Rights
 import com.example.pillnotifier.model.Medicine
 import com.example.pillnotifier.model.MedicineTake
 import com.example.pillnotifier.model.Regularity
+import com.example.pillnotifier.model.TakeStatus
 import java.util.*
 
 
@@ -21,12 +23,11 @@ class ScheduleFragment : Fragment() {
 
     init {
         // TODO: delete plug and make initialization of list
-        val medicineTake = MedicineTake(
-            Medicine("Vitamin A", "4 pills", Regularity.DAILY, Date(2022, 1, 1)),
-            Date(2022, 1, 7)
-        )
-        for (i in 1..20)
-            medicineTakeList.add(medicineTake)
+        val medicine = Medicine("Vitamin A", "4 pills", Regularity.DAILY, Date(2022, 1, 1))
+        val date = Date(2022, 1, 7)
+        medicineTakeList.add(MedicineTake(medicine, date, TakeStatus.TAKEN))
+        medicineTakeList.add(MedicineTake(medicine, date, TakeStatus.NOT_TAKEN))
+        medicineTakeList.add(MedicineTake(medicine, date, TakeStatus.UNKNOWN))
     }
 
     override fun onCreateView(
@@ -41,7 +42,7 @@ class ScheduleFragment : Fragment() {
         }
 
         val recyclerView: RecyclerView = view.findViewById(R.id.rv_schedule_meds)
-        recyclerView.adapter = MedicineAdapter(requireContext(), medicineTakeList)
+        recyclerView.adapter = MedicineTakeAdapter(requireContext(), medicineTakeList, Rights.WRITE)
         val dividerItemDecoration = DividerItemDecoration(
             recyclerView.context,
             DividerItemDecoration.VERTICAL

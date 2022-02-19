@@ -9,10 +9,21 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pillnotifier.R
 import com.example.pillnotifier.model.MedicineTake
+import com.example.pillnotifier.model.TakeStatus
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MedicineAdapter(context: Context, private val medicines: List<MedicineTake>) : RecyclerView.Adapter<MedicineAdapter.ViewHolder>() {
+enum class Rights {
+    READ,
+    WRITE
+}
+
+class MedicineTakeAdapter(
+    private val context: Context,
+    private val medicines: List<MedicineTake>,
+    private val rights: Rights
+) :
+    RecyclerView.Adapter<MedicineTakeAdapter.ViewHolder>() {
     private val layoutInflater = LayoutInflater.from(context)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View = layoutInflater.inflate(R.layout.medicine_in_schedule_item, parent, false)
@@ -20,14 +31,24 @@ class MedicineAdapter(context: Context, private val medicines: List<MedicineTake
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val medicineTake = medicines.get(position)
+        val medicineTake = medicines[position]
         holder.medicineNameTV.text = medicineTake.medicine.name
         holder.portionTV.text = medicineTake.medicine.portion
 
         val df = SimpleDateFormat("HH:mm", Locale.getDefault())
         holder.takeTimeTV.text = df.format(medicineTake.dateOfTake)
 
-        // TODO: reactions on clicking taking and not taking
+        when (medicineTake.takeStatus) {
+            TakeStatus.UNKNOWN -> {
+                holder.itemView.setBackgroundColor(context.resources.getColor(R.color.unknown_status))
+                if (rights == Rights.READ) {
+                    holder.takenIV.visibility = View.INVISIBLE
+                    holder.notTakenIV.visibility = View.INVISIBLE
+                }
+            }
+            TakeStatus.TAKEN -> holder.notTakenIV.visibility = View.INVISIBLE
+            TakeStatus.NOT_TAKEN -> holder.takenIV.visibility = View.INVISIBLE
+        }
     }
 
     override fun getItemCount(): Int {

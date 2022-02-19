@@ -35,7 +35,7 @@
 
 
         <TextView
-            android:id="@+id/nickname_tv"
+            android:id="@+id/user_nickname_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/nickname_example"
@@ -44,13 +44,4 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/take_time_tv" />
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/not_taken_iv"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="15"
-        android:background="@color/white"
-        android:scaleType="fitCenter"
-        android:src="@drawable/drop_down_icon" />
 </LinearLayout>
