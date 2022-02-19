@@ -4,10 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.LinearLayoutCompat
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pillnotifier.R
 import com.example.pillnotifier.adapters.MedicineAdapter
@@ -29,15 +28,17 @@ class ScheduleFragment : Fragment() {
         for (i in 1..20)
             medicineTakeList.add(medicineTake)
     }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_schedule, container, false)
+        val tvDate = view.findViewById<TextView>(R.id.tvDate)
+        tvDate.setOnClickListener {
+            val newFragment = DatePickerFragment(tvDate)
+            newFragment.show(childFragmentManager, "Date Picker")
+        }
 
         val recyclerView: RecyclerView = view.findViewById(R.id.rv_schedule_meds)
         recyclerView.adapter = MedicineAdapter(requireContext(), medicineTakeList)
