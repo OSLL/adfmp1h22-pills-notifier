@@ -8,4 +8,13 @@
     <string name="link">\u0040great_detective</string>
     <string name="notification">Kimberly White didn\'t take Vitamin A</string>
     <string name="date">7 February at 15:40</string>
+    <string name="medicine_name">Vitamin A</string>
+    <string name="instructions">Take 2 pills</string>
+    <string name="regularity">Daily</string>
+    <string-array name="names">
+        <item>Please select regularity</item>
+        <item>Daily</item>
+        <item>Once in two days</item>
+        <item>Once a week</item>
+    </string-array>
 </resources>
