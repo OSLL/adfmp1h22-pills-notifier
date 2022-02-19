@@ -17,4 +17,9 @@
         <item>Once in two days</item>
         <item>Once a week</item>
     </string-array>
+    <string name="medicine_name_example">Vitamin A</string>
+    <string name="medicine_portion_example">4 pills</string>
+    <string name="take_time_example">08:00</string>
+    <string name="user_name_example">Kimberly White</string>
+    <string name="nickname_example">\@kwhite</string>
 </resources>

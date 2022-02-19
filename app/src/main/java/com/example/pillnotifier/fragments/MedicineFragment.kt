@@ -26,7 +26,6 @@ class MedicineFragment : Fragment() {
         for (i in 1..20)
             medicine.add(medicineInfo)
     }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
