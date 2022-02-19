@@ -12,16 +12,20 @@
         <activity
             android:name=".MedicineProfile"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".Notification"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".Settings"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

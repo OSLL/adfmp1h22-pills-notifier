@@ -18,7 +18,7 @@ class DatePickerFragment(val tvDate: TextView) : DialogFragment(), DatePickerDia
 
         return DatePickerDialog(
             requireContext(),
-            android.R.style.Theme_Holo_Light_Dialog_NoActionBar_MinWidth,
+            android.R.style.ThemeOverlay_Material_Dialog,
             this,
             year,
             month,
