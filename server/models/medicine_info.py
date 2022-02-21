@@ -12,6 +12,7 @@ class Regularity(Enum):
 @dataclass
 class MedicineInfo:
     medicine_name: str
+    portion: str
     instructions: str
     regularity: Regularity
     start_date: datetime

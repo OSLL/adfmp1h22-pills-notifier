@@ -1,32 +1,80 @@
 # import main Flask class and request object
 from datetime import datetime
+
+import flask
 from flask import Flask, request
-from typing import Dict
+from typing import Dict, List
 from models.medicine_info import Regularity, MedicineInfo
 
 # create the Flask app
 app = Flask(__name__)
 
+user_to_medicines: Dict[str, List[MedicineInfo]] = {}
 
-user_to_medicine: Dict[str, MedicineInfo] = {}
+
+def from_json_to_medicine_info(json):
+    medicine_name = json['medicine_name']
+    instructions = json['instructions']
+    portion = json['portion']
+    regularity = Regularity[json['regularity']]
+    format_date = '%Y-%m-%d'
+    start_date = datetime.strptime(json['date'], format_date)
+    format_time = '%H:%M'
+    time = datetime.strptime(json['time'], format_time)
+    return MedicineInfo(medicine_name=medicine_name, instructions=instructions, regularity=regularity,
+                        start_date=start_date, time=time, portion=portion)
 
 
-@app.route('/medicine', methods=['POST'])
+def from_medicine_info_to_json(medicine_info: MedicineInfo):
+    return {
+        'medicine_name': medicine_info.medicine_name,
+        'portion': medicine_info.portion,
+        'instructions': medicine_info.instructions,
+        'regularity': str(medicine_info.regularity),
+        'date': medicine_info.start_date.strftime('%Y-%m-%d'),
+        'time': medicine_info.time.strftime('%H:%M')
+    }
+
+
+@app.route('/user/add_medicine', methods=['POST'])
 def add_medicine():
     content_type = request.headers.get('Content-Type')
     if content_type == 'application/json':
         json = request.json
         user_id = json['user_id']
-        medicine_name = json['medicine_name']
-        instructions = json['instructions']
-        regularity = Regularity[json['regularity']]
-        format_date = '%Y-%m-%d'
-        start_date = datetime.strptime(json['date'], format_date)
-        format_time = '%H:%M'
-        time = datetime.strptime(json['time'], format_time)
-        medicine_info = MedicineInfo(medicine_name=medicine_name, instructions=instructions, regularity=regularity,
-                                     start_date=start_date, time=time)
-        user_to_medicine[user_id] = medicine_info
+        medicine_info = from_json_to_medicine_info(json)
+        if user_id in user_to_medicines:
+            user_to_medicines[user_id].append(medicine_info)
+        else:
+            user_to_medicines[user_id] = [medicine_info]
+        return 'OK'
+    else:
+        return 'Content-Type not supported!'
+
+
+@app.route('/user/get_medicines', methods=['GET'])
+def get_medicines():
+    content_type = request.headers.get('Content-Type')
+    if content_type == 'application/json':
+        json = request.json
+        user_id = json['user_id']
+        return flask.jsonify(
+            [from_medicine_info_to_json(medicine_info) for medicine_info in user_to_medicines.get(user_id, [])]
+        )
+    else:
+        return 'Content-Type not supported!'
+
+
+@app.route('/user/delete_medicine', methods=['DELETE'])
+def delete_medicine():
+    content_type = request.headers.get('Content-Type')
+    if content_type == 'application/json':
+        json = request.json
+        user_id = json['user_id']
+        medicine_info = from_json_to_medicine_info(json)
+        if medicine_info not in user_to_medicines.get(user_id, []):
+            return "Medicine wasn't found"
+        user_to_medicines[user_id].remove(medicine_info)
         return 'OK'
     else:
         return 'Content-Type not supported!'
