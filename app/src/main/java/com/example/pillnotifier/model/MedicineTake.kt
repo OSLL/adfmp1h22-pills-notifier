@@ -1,10 +1,11 @@
 package com.example.pillnotifier.model;
 
-import java.util.Date
+import java.time.LocalDate
 
 enum class TakeStatus {
     TAKEN,
     NOT_TAKEN,
     UNKNOWN
 }
-class MedicineTake(val medicine: Medicine, val dateOfTake: Date, val takeStatus: TakeStatus)
+
+class MedicineTake(val medicine: Medicine, val takeStatus: TakeStatus)

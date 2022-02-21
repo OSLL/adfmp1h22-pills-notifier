@@ -12,11 +12,11 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pillnotifier.MedicineProfile
 import com.example.pillnotifier.R
-import com.example.pillnotifier.model.MedicineInfo
+import com.example.pillnotifier.model.Medicine
 import java.time.format.DateTimeFormatter
 
 
-class MedicineAdapter(context: Context, private val medicine: List<MedicineInfo>) : RecyclerView.Adapter<MedicineAdapter.ViewHolder>() {
+class MedicineAdapter(context: Context, private val medicine: List<Medicine>) : RecyclerView.Adapter<MedicineAdapter.ViewHolder>() {
     private val layoutInflater = LayoutInflater.from(context)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,9 +27,10 @@ class MedicineAdapter(context: Context, private val medicine: List<MedicineInfo>
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val medicine = medicine.get(position)
-        holder.medicineName.text = medicine.medicineName
-        holder.instructions.text = medicine.medicineInstruction
-        holder.time.text = medicine.time.format(DateTimeFormatter.ofPattern("HH:mm"))
+        holder.medicineName.text = medicine.name
+        holder.instructions.text = medicine.instruction
+        holder.regularityAndTakeTime.text = medicine.regularity.stringInterpretation +
+                " at " + medicine.takeTime.format(DateTimeFormatter.ofPattern("HH:mm"))
         holder.deleteButton.setOnClickListener {
             val intent = Intent(it.context, MedicineProfile::class.java)
             it.context.startActivity(intent)
@@ -47,7 +48,7 @@ class MedicineAdapter(context: Context, private val medicine: List<MedicineInfo>
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val medicineName: TextView = itemView.findViewById(R.id.medicine_name)
         val instructions: TextView = itemView.findViewById(R.id.medicine_instructions)
-        val time: TextView = itemView.findViewById(R.id.regularity)
+        val regularityAndTakeTime: TextView = itemView.findViewById(R.id.regularity_ant_take_time)
         val deleteButton: Button = itemView.findViewById(R.id.button_delete)
         val editButton: Button = itemView.findViewById(R.id.button_edit)
     }

@@ -1,17 +1,18 @@
 package com.example.pillnotifier.adapters
 
 import android.content.Context
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pillnotifier.R
 import com.example.pillnotifier.model.MedicineTake
 import com.example.pillnotifier.model.TakeStatus
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.format.DateTimeFormatter
 
 enum class Rights {
     READ,
@@ -30,13 +31,13 @@ class MedicineTakeAdapter (
         return ViewHolder(view)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val medicineTake = medicines[position]
         holder.medicineNameTV.text = medicineTake.medicine.name
         holder.portionTV.text = medicineTake.medicine.portion
 
-        val df = SimpleDateFormat("HH:mm", Locale.getDefault())
-        holder.takeTimeTV.text = df.format(medicineTake.dateOfTake)
+        holder.takeTimeTV.text = medicineTake.medicine.takeTime.format(DateTimeFormatter.ofPattern("HH:mm"))
 
         when (medicineTake.takeStatus) {
             TakeStatus.UNKNOWN -> {

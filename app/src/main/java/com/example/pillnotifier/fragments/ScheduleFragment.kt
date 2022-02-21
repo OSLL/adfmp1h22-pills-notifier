@@ -1,10 +1,12 @@
 package com.example.pillnotifier.fragments
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
@@ -15,19 +17,24 @@ import com.example.pillnotifier.model.Medicine
 import com.example.pillnotifier.model.MedicineTake
 import com.example.pillnotifier.model.Regularity
 import com.example.pillnotifier.model.TakeStatus
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.Month
 import java.util.*
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 class ScheduleFragment : Fragment() {
     private val medicineTakeList: MutableList<MedicineTake> = mutableListOf()
 
     init {
         // TODO: delete plug and make initialization of list
-        val medicine = Medicine("Vitamin A", "4 pills", Regularity.DAILY, Date(2022, 1, 1))
-        val date = Date(2022, 1, 7)
-        medicineTakeList.add(MedicineTake(medicine, date, TakeStatus.TAKEN))
-        medicineTakeList.add(MedicineTake(medicine, date, TakeStatus.NOT_TAKEN))
-        medicineTakeList.add(MedicineTake(medicine, date, TakeStatus.UNKNOWN))
+        val medicine = Medicine("Vitamin A", "4 pills", LocalTime.of(8, 0), Regularity.DAILY,
+            LocalDate.of(2022, Month.JANUARY, 1))
+        val date = LocalDate.of(2022, Month.JANUARY, 7)
+        medicineTakeList.add(MedicineTake(medicine, TakeStatus.TAKEN))
+        medicineTakeList.add(MedicineTake(medicine, TakeStatus.NOT_TAKEN))
+        medicineTakeList.add(MedicineTake(medicine, TakeStatus.UNKNOWN))
     }
 
     override fun onCreateView(

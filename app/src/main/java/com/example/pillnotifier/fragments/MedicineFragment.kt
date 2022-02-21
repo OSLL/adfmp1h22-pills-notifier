@@ -14,18 +14,23 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.pillnotifier.MedicineProfile
 import com.example.pillnotifier.R
 import com.example.pillnotifier.adapters.MedicineAdapter
-import com.example.pillnotifier.model.MedicineInfo
+import com.example.pillnotifier.model.Medicine
+import com.example.pillnotifier.model.Regularity
+import java.time.LocalDate
 import java.time.LocalTime
+import java.time.Month
 
 @RequiresApi(Build.VERSION_CODES.O)
 class MedicineFragment : Fragment() {
-    private val medicine: MutableList<MedicineInfo> = mutableListOf()
+    private val medicinesList: MutableList<Medicine> = mutableListOf()
 
     init {
-        val medicineInfo = MedicineInfo("Vitamin A", "Take 2 pills", LocalTime.of(13, 15))
+        val medicine = Medicine("Vitamin A", "4 pills", LocalTime.of(8, 0), Regularity.DAILY,
+            LocalDate.of(2022, Month.JANUARY, 1), "Take 4 pills")
         for (i in 1..20)
-            medicine.add(medicineInfo)
+            medicinesList.add(medicine)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -41,7 +46,7 @@ class MedicineFragment : Fragment() {
             it.context.startActivity(intent)
         }
         val recyclerView: RecyclerView = view.findViewById(R.id.rv_medicine)
-        recyclerView.adapter = MedicineAdapter(requireContext(), medicine)
+        recyclerView.adapter = MedicineAdapter(requireContext(), medicinesList)
         val dividerItemDecoration = DividerItemDecoration(
             recyclerView.context,
             DividerItemDecoration.VERTICAL
