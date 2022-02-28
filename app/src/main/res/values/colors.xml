@@ -11,4 +11,7 @@
     <color name="grey">#808080</color>
     <color name="transparent">#00000000</color>
     <color name="unknown_status">#334AADF4</color>
+    <color name="blue_500">#4AADF4</color>
+    <color name="blue_700">#5F9DFF</color>
+
 </resources>

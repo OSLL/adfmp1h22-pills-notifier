@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    android:background="@color/purple_200"
+    android:background="?attr/colorOnPrimary"
     tools:context=".ui.login.LoginActivity">
 
     <TextView
@@ -19,7 +19,7 @@
         android:layout_marginTop="10dp"
         android:gravity="center"
         android:text="@string/app_name"
-        android:textColor="@color/purple_500"
+        android:textColor="?attr/colorPrimary"
         android:textSize="35sp"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
@@ -99,7 +99,7 @@
             android:background="@drawable/default_button"
             android:backgroundTintMode="multiply"
             android:text="@string/login"
-            app:iconTint="@color/purple_500"
+            app:iconTint="?attr/colorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/loading" />
@@ -110,7 +110,7 @@
             android:layout_height="20dp"
             android:layout_marginTop="15dp"
             android:text="@string/or"
-            android:textColor="@color/purple_500"
+            android:textColor="?attr/colorPrimary"
             android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -124,7 +124,7 @@
             android:layout_marginTop="5dp"
             android:background="@color/transparent"
             android:text="@string/register"
-            android:textColor="@color/purple_500"
+            android:textColor="?attr/colorPrimary"
             android:textSize="17sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
