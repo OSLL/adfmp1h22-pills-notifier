@@ -1,15 +1,18 @@
 # import main Flask class and request object
+import uuid
 from datetime import datetime
 
 import flask
 from flask import Flask, request
 from typing import Dict, List
 from models.medicine_info import Regularity, MedicineInfo
+from models.user_info import UserInfo
 
 # create the Flask app
 app = Flask(__name__)
 
 user_to_medicines: Dict[str, List[MedicineInfo]] = {}
+users_list: Dict[str, UserInfo] = {'test_user_id': UserInfo('test_user', '123456')}
 
 
 def from_json_to_medicine_info(json):
@@ -76,6 +79,21 @@ def delete_medicine():
             return "Medicine wasn't found"
         user_to_medicines[user_id].remove(medicine_info)
         return 'OK'
+    else:
+        return 'Content-Type not supported!'
+
+
+@app.route('/user/login', methods=['POST'])
+def login():
+    content_type = request.headers.get('Content-Type')
+    if content_type.startswith('application/json'):
+        json = request.json
+        username = json['username']
+        password = json['password']
+        for user_id, user in users_list.items():
+            if user.username == username and user.password == password:
+                return user_id, 200
+        return 'Incorrect login or password', 404
     else:
         return 'Content-Type not supported!'
 

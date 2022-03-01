@@ -9,6 +9,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
@@ -55,19 +56,27 @@ class LoginActivity : AppCompatActivity() {
         })
 
         loginViewModel.loginResult.observe(this@LoginActivity, Observer {
+            Log.d("MY_LOG", "OBSERVE1")
             val loginResult = it ?: return@Observer
+            Log.d("MY_LOG", "OBSERVE2")
 
             loading.visibility = View.GONE
             if (loginResult.error != null) {
+                Log.d("MY_LOG", "IT FAILED")
                 showLoginFailed(loginResult.error)
             }
             if (loginResult.success != null) {
+                Log.d("MY_LOG", "IT SUCCEEDED")
                 updateUiWithUser(loginResult.success)
-            }
-            setResult(Activity.RESULT_OK)
 
-            //Complete and destroy login activity once successful
-            finish()
+                setResult(Activity.RESULT_OK)
+
+                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                startActivity(intent)
+
+                //Complete and destroy login activity once successful
+                finish()
+            }
         })
 
         register?.setOnClickListener {
@@ -105,8 +114,6 @@ class LoginActivity : AppCompatActivity() {
             login.setOnClickListener {
                 loading.visibility = View.VISIBLE
                 loginViewModel.login(username.text.toString(), password.text.toString())
-                val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                startActivity(intent)
             }
         }
     }
