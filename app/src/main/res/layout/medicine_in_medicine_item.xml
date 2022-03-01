@@ -63,21 +63,27 @@
         app:layout_constraintBottom_toBottomOf="@id/medicine_info_ll"
         app:layout_constraintTop_toTopOf="@id/medicine_info_ll">
 
-        <Button
+        <ImageButton
             android:id="@+id/button_delete"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="50"
-            android:background="@drawable/baseline_delete_24"
-            android:scaleType="fitCenter"/>
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center"
+            android:layout_weight="0.5"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:background="@null"
+            android:src="@drawable/baseline_delete_24" />
 
-        <Button
+        <ImageButton
             android:id="@+id/button_edit"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="50"
-            android:background="@drawable/baseline_edit_24"
-            android:scaleType="fitCenter" />
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center"
+            android:layout_weight="0.5"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:background="@null"
+            android:src="@drawable/baseline_edit_24" />
     </LinearLayout>
 
 </LinearLayout>

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
@@ -49,7 +50,7 @@ class MedicineAdapter(context: Context, private val medicine: List<Medicine>) : 
         val medicineName: TextView = itemView.findViewById(R.id.medicine_name)
         val instructions: TextView = itemView.findViewById(R.id.medicine_instructions)
         val regularityAndTakeTime: TextView = itemView.findViewById(R.id.regularity_ant_take_time)
-        val deleteButton: Button = itemView.findViewById(R.id.button_delete)
-        val editButton: Button = itemView.findViewById(R.id.button_edit)
+        val deleteButton: ImageButton = itemView.findViewById(R.id.button_delete)
+        val editButton: ImageButton = itemView.findViewById(R.id.button_edit)
     }
 }
