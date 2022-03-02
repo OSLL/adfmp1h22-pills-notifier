@@ -19,7 +19,7 @@ class LoginDataSource {
 
     suspend fun login(username: String, password: String): Result<LoggedInUser> {
         return suspendCoroutine { cont ->
-            val user = UserInfo(null, username, password)
+            val user = UserInfo(null, username, password, null)
             val gson = Gson()
             val userJson = gson.toJson(user)
             val client = OkHttpClient.Builder().build()
@@ -39,7 +39,8 @@ class LoginDataSource {
                 override fun onResponse(call: Call, response: Response) {
                     val message: String = response.body!!.string()
                     if (response.code == 200) {
-                        cont.resume(Result.Success(LoggedInUser(message, username)))
+                        val loggedInUser = gson.fromJson(message, LoggedInUser::class.java)
+                        cont.resume(Result.Success(loggedInUser))
                     } else {
                         onFailure(call, IOException(message))
                     }

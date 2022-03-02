@@ -8,5 +8,7 @@ data class UserInfo (
     @SerializedName("username")
     val username: String?,
     @SerializedName("password")
-    val password: String?
+    val password: String?,
+    @SerializedName("user_id")
+    val userId: String?
 )

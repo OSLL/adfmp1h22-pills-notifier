@@ -1,5 +1,7 @@
 package com.example.pillnotifier.ui.login
 
 data class RegisteredUserView(
-    val displayName: String
+    val userId: String,
+    val fullname: String,
+    val username: String
 )

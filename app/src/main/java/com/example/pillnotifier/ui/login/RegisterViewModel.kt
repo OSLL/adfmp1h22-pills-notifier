@@ -31,9 +31,13 @@ class RegisterViewModel() : ViewModel() {
     private val _registerResult = MutableLiveData<RegisterResult>()
     val registerResult: LiveData<RegisterResult> = _registerResult
 
-    suspend fun _register(fullname: String, username: String, password: String): Result<LoggedInUser> {
+    suspend fun _register(
+        fullname: String,
+        username: String,
+        password: String
+    ): Result<LoggedInUser> {
         return suspendCoroutine { cont ->
-            val user = UserInfo(fullname, username, password)
+            val user = UserInfo(fullname, username, password, null)
             val gson = Gson()
             val userJson = gson.toJson(user)
             val client = OkHttpClient.Builder().build()
@@ -50,10 +54,12 @@ class RegisterViewModel() : ViewModel() {
                 override fun onFailure(call: Call, e: IOException) {
                     cont.resume(Result.Error(e))
                 }
+
                 override fun onResponse(call: Call, response: Response) {
                     val message: String = response.body!!.string()
                     if (response.code == 200) {
-                        cont.resume(Result.Success(LoggedInUser(message, username)))
+                        val loggedInUser = gson.fromJson(message, LoggedInUser::class.java)
+                        cont.resume(Result.Success(loggedInUser))
                     } else {
                         onFailure(call, IOException(message))
                     }
@@ -69,7 +75,13 @@ class RegisterViewModel() : ViewModel() {
             }
             if (result is Result.Success) {
                 _registerResult.value =
-                    RegisterResult(success = RegisteredUserView(displayName = result.data.displayName))
+                    RegisterResult(
+                        success = RegisteredUserView(
+                            username = result.data.username,
+                            fullname = result.data.fullname,
+                            userId = result.data.userId
+                        )
+                    )
             } else {
                 _registerResult.value = RegisterResult(error = R.string.registration_failed)
             }

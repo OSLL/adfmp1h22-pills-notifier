@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime
 
 import flask
+import json
 from flask import Flask, request
 from typing import Dict, List
 from models.medicine_info import Regularity, MedicineInfo
@@ -87,12 +88,13 @@ def delete_medicine():
 def login():
     content_type = request.headers.get('Content-Type')
     if content_type.startswith('application/json'):
-        json = request.json
-        username = json['username']
-        password = json['password']
+        json_request = request.json
+        username = json_request['username']
+        password = json_request['password']
         for user_id, user in users_list.items():
             if user.username == username and user.password == password:
-                return user_id, 200
+                result = {'userId': user_id, 'fullname': user.fullname, 'username': username}
+                return json.dumps(result), 200
         return 'Incorrect login or password', 404
     else:
         return 'Content-Type not supported!', 404
@@ -102,16 +104,39 @@ def login():
 def register():
     content_type = request.headers.get('Content-Type')
     if content_type.startswith('application/json'):
-        json = request.json
-        full_name = json['full_name']
-        username = json['username']
-        password = json['password']
+        json_request = request.json
+        full_name = json_request['full_name']
+        username = json_request['username']
+        password = json_request['password']
         for user_id, user in users_list.items():
             if user.username == username:
                 return 'Username already taken', 404
         user_id = str(uuid.uuid4())
         users_list[user_id] = UserInfo(full_name, username, password)
-        return user_id, 200
+        result = {'userId': user_id, 'fullname': full_name, 'username': username}
+        return json.dumps(result), 200
+    else:
+        return 'Content-Type not supported!', 404
+
+
+@app.route('/user/update', methods=['POST'])
+def update():
+    content_type = request.headers.get('Content-Type')
+    if content_type.startswith('application/json'):
+        json_request = request.json
+        user_id = json_request['user_id']
+        full_name = json_request['full_name']
+        username = json_request['username']
+        for user_id_, user in users_list.items():
+            if user.username == username and user_id_ != user_id:
+                return 'Username already taken', 404
+        if user_id not in users_list:
+            return f'No user with id {user_id}', 404
+        user = users_list[user_id]
+        user.username = username
+        user.fullname = full_name
+        users_list[user_id] = user
+        return 'OK', 200
     else:
         return 'Content-Type not supported!', 404
 

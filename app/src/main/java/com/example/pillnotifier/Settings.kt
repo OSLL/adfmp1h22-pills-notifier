@@ -6,7 +6,26 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
+import com.example.pillnotifier.data.Result
+import com.example.pillnotifier.data.model.LoggedInUser
+import com.example.pillnotifier.data.model.UserInfo
+import com.example.pillnotifier.model.DataHolder
+import com.example.pillnotifier.ui.login.RegisterResult
+import com.example.pillnotifier.ui.login.RegisteredUserView
+import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.IOException
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 class Settings : AppCompatActivity() {
@@ -18,6 +37,41 @@ class Settings : AppCompatActivity() {
 
     var submitButton: Button? = null
 
+    suspend fun _updateUserInfo(
+        fullname: String?,
+        username: String?
+    ): Result<String> {
+        return suspendCoroutine { cont ->
+            val user = UserInfo(fullname, username, null, DataHolder.getData("userId"))
+            val gson = Gson()
+            val userJson = gson.toJson(user)
+            val client = OkHttpClient.Builder().build()
+
+            val body: RequestBody = userJson.toRequestBody("application/json".toMediaTypeOrNull())
+
+            val request: Request = Request.Builder()
+                .url(Constants.BASE_URL + "/user/update")
+                .addHeader("Content-Type", "application/json")
+                .post(body)
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    cont.resume(Result.Error(e))
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    val message: String = response.body!!.string()
+                    if (response.code == 200) {
+                        cont.resume(Result.Success(message))
+                    } else {
+                        onFailure(call, IOException(message))
+                    }
+                }
+            })
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
@@ -25,17 +79,44 @@ class Settings : AppCompatActivity() {
         linkInput = findViewById<View>(R.id.link_edit) as EditText
         submitButton = findViewById<View>(R.id.submitButton) as Button
         submitButton!!.setOnClickListener {
-            name = nameInput?.text.toString()
-            link = linkInput?.text.toString()
-            val intent = Intent()
-            if (name != null && name != "") {
-                intent.putExtra("username", name)
+            lifecycleScope.launch {
+                val result = withContext(Dispatchers.IO) {
+                    name = nameInput?.text.toString()
+                    if (name == null || name == "") {
+                        name = DataHolder.getData("fullname")
+                    }
+
+                    link = linkInput?.text.toString()
+                    if (link == null || link == "") {
+                        link = DataHolder.getData("username")
+                    }
+                    _updateUserInfo(name, link)
+                }
+                if (result is Result.Success) {
+                    Toast.makeText(
+                        applicationContext,
+                        "User profile updated",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        applicationContext,
+                        "Could not update user profile",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                val intent = Intent()
+                name = nameInput?.text.toString()
+                if (name != null && name != "") {
+                    intent.putExtra("username", name)
+                }
+                link = linkInput?.text.toString()
+                if (link != null && link != "") {
+                    intent.putExtra("link", link)
+                }
+                setResult(Activity.RESULT_OK, intent)
+                onBackPressed()
             }
-            if (link != null && link != "") {
-                intent.putExtra("link", link)
-            }
-            setResult(Activity.RESULT_OK, intent)
-            onBackPressed()
         }
     }
 }

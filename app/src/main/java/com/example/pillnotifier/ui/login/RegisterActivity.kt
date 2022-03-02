@@ -14,6 +14,7 @@ import com.example.pillnotifier.MainActivity
 import com.example.pillnotifier.R
 
 import com.example.pillnotifier.databinding.ActivityRegisterBinding
+import com.example.pillnotifier.model.DataHolder
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
@@ -60,6 +61,9 @@ class RegisterActivity : AppCompatActivity() {
             if (registerResult.success != null) {
                 updateUiWithUser(registerResult.success)
                 val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+                DataHolder.setData("userId", registerResult.success.userId)
+                DataHolder.setData("fullname", registerResult.success.fullname)
+                DataHolder.setData("username", registerResult.success.username)
                 startActivity(intent)
                 setResult(Activity.RESULT_OK)
                 //Complete and destroy login activity once successful
@@ -119,7 +123,7 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun updateUiWithUser(model: RegisteredUserView) {
         val welcome = getString(R.string.welcome)
-        val displayName = model.displayName
+        val displayName = model.fullname
         Toast.makeText(
             applicationContext,
             "$welcome $displayName",

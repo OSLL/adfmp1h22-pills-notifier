@@ -5,5 +5,6 @@ package com.example.pillnotifier.data.model
  */
 data class LoggedInUser(
     val userId: String,
-    val displayName: String
+    val fullname: String,
+    val username: String
 )

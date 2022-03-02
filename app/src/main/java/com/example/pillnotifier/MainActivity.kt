@@ -1,5 +1,6 @@
 package com.example.pillnotifier
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -10,10 +11,10 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.viewpager2.widget.ViewPager2
 import com.example.pillnotifier.adapters.ViewPagerAdapter
+import com.example.pillnotifier.model.DataHolder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -30,10 +31,12 @@ class MainActivity : AppCompatActivity() {
                 if (result.data?.hasExtra("username") == true) {
                     val username = findViewById<View>(R.id.username) as TextView
                     username.text = result.data!!.extras?.getString("username")
+                    DataHolder.setData("username", result.data!!.extras?.getString("username"))
                 }
                 if (result.data?.hasExtra("link") == true) {
                     val link = findViewById<View>(R.id.link) as TextView
                     link.text = result.data!!.extras?.getString("link")
+                    DataHolder.setData("link", result.data!!.extras?.getString("link"))
                 }
             }
         }
@@ -66,6 +69,13 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         val mNavigationView = findViewById<View>(R.id.nav_menu) as NavigationView
+        val headerView: View = mNavigationView.getHeaderView(0)
+        val username = headerView.findViewById<View>(R.id.username) as TextView
+        username.text = DataHolder.getData("fullname")
+
+        val link = headerView.findViewById<View>(R.id.link) as TextView
+        link.text = DataHolder.getData("username")
+
         mNavigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.edit_profile -> {

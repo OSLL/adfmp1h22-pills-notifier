@@ -19,6 +19,7 @@ import com.example.pillnotifier.MainActivity
 import com.example.pillnotifier.databinding.ActivityLoginBinding
 
 import com.example.pillnotifier.R
+import com.example.pillnotifier.model.DataHolder
 
 class LoginActivity : AppCompatActivity() {
 
@@ -68,6 +69,9 @@ class LoginActivity : AppCompatActivity() {
                 setResult(Activity.RESULT_OK)
 
                 val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                DataHolder.setData("userId", loginResult.success.userId)
+                DataHolder.setData("fullname", loginResult.success.fullname)
+                DataHolder.setData("username", loginResult.success.username)
                 startActivity(intent)
 
                 //Complete and destroy login activity once successful
@@ -116,7 +120,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun updateUiWithUser(model: LoggedInUserView) {
         val welcome = getString(R.string.welcome)
-        val displayName = model.displayName
+        val displayName = model.fullname
         // TODO : initiate successful logged in experience
         Toast.makeText(
             applicationContext,
