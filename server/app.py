@@ -12,7 +12,7 @@ from models.user_info import UserInfo
 app = Flask(__name__)
 
 user_to_medicines: Dict[str, List[MedicineInfo]] = {}
-users_list: Dict[str, UserInfo] = {'test_user_id': UserInfo('test_user', '123456')}
+users_list: Dict[str, UserInfo] = {'test_user_id': UserInfo('test_user', 'test_user', '123456')}
 
 
 def from_json_to_medicine_info(json):
@@ -95,7 +95,25 @@ def login():
                 return user_id, 200
         return 'Incorrect login or password', 404
     else:
-        return 'Content-Type not supported!'
+        return 'Content-Type not supported!', 404
+
+
+@app.route('/user/register', methods=['POST'])
+def register():
+    content_type = request.headers.get('Content-Type')
+    if content_type.startswith('application/json'):
+        json = request.json
+        full_name = json['full_name']
+        username = json['username']
+        password = json['password']
+        for user_id, user in users_list.items():
+            if user.username == username:
+                return 'Username already taken', 404
+        user_id = str(uuid.uuid4())
+        users_list[user_id] = UserInfo(full_name, username, password)
+        return user_id, 200
+    else:
+        return 'Content-Type not supported!', 404
 
 
 if __name__ == '__main__':

@@ -19,14 +19,12 @@ class LoginDataSource {
 
     suspend fun login(username: String, password: String): Result<LoggedInUser> {
         return suspendCoroutine { cont ->
-            val user = UserInfo(username, password)
+            val user = UserInfo(null, username, password)
             val gson = Gson()
             val userJson = gson.toJson(user)
-            Log.d("MY_LOG", userJson)
             val client = OkHttpClient.Builder().build()
 
             val body: RequestBody = userJson.toRequestBody("application/json".toMediaTypeOrNull())
-            Log.d("MY_LOG", "application/json".toMediaTypeOrNull().toString())
 
             val request: Request = Request.Builder()
                 .url(Constants.BASE_URL + "/user/login")
@@ -36,8 +34,6 @@ class LoginDataSource {
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    Log.d("MY_LOG", "FAILURE ")
-                    Log.d("MY_LOG", e.message.toString())
                     cont.resume(Result.Error(e))
                 }
                 override fun onResponse(call: Call, response: Response) {
@@ -45,7 +41,6 @@ class LoginDataSource {
                     if (response.code == 200) {
                         cont.resume(Result.Success(LoggedInUser(message, username)))
                     } else {
-                        Log.d("MY_LOG", response.code.toString())
                         onFailure(call, IOException(message))
                     }
                 }

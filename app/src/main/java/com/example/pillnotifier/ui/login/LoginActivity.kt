@@ -56,17 +56,13 @@ class LoginActivity : AppCompatActivity() {
         })
 
         loginViewModel.loginResult.observe(this@LoginActivity, Observer {
-            Log.d("MY_LOG", "OBSERVE1")
             val loginResult = it ?: return@Observer
-            Log.d("MY_LOG", "OBSERVE2")
 
             loading.visibility = View.GONE
             if (loginResult.error != null) {
-                Log.d("MY_LOG", "IT FAILED")
                 showLoginFailed(loginResult.error)
             }
             if (loginResult.success != null) {
-                Log.d("MY_LOG", "IT SUCCEEDED")
                 updateUiWithUser(loginResult.success)
 
                 setResult(Activity.RESULT_OK)

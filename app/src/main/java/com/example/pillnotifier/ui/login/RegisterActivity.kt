@@ -4,11 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.lifecycle.Observer
@@ -20,50 +17,54 @@ import com.example.pillnotifier.databinding.ActivityRegisterBinding
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRegisterBinding
-    private lateinit var loginViewModel: LoginViewModel
+    private lateinit var registerViewModel: RegisterViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val fullName = binding.fullname
         val username = binding.username
         val password = binding.password
         val register = binding.signUp
         val loading = binding.loading
         val login = binding.backToLogin
 
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
+        registerViewModel = ViewModelProvider(this, RegisterViewModelFactory())
+            .get(RegisterViewModel::class.java)
 
-        loginViewModel.loginFormState.observe(this@RegisterActivity, Observer {
-            val loginState = it ?: return@Observer
+        registerViewModel.registerFormState.observe(this@RegisterActivity, Observer {
+            val registerState = it ?: return@Observer
 
-            // disable login button unless both username / password is valid
-            register.isEnabled = loginState.isDataValid
+            register.isEnabled = registerState.isDataValid
 
-            if (loginState.usernameError != null) {
-                username.error = getString(loginState.usernameError)
+            if (registerState.fullNameError != null) {
+                fullName.error = getString(registerState.fullNameError)
             }
-            if (loginState.passwordError != null) {
-                password.error = getString(loginState.passwordError)
+            if (registerState.usernameError != null) {
+                username.error = getString(registerState.usernameError)
+            }
+            if (registerState.passwordError != null) {
+                password.error = getString(registerState.passwordError)
             }
         })
 
-        loginViewModel.loginResult.observe(this@RegisterActivity, Observer {
-            val loginResult = it ?: return@Observer
+        registerViewModel.registerResult.observe(this@RegisterActivity, Observer {
+            val registerResult = it ?: return@Observer
 
             loading.visibility = View.GONE
-            if (loginResult.error != null) {
-                showLoginFailed(loginResult.error)
+            if (registerResult.error != null) {
+                showRegistrationFailed(registerResult.error)
             }
-            if (loginResult.success != null) {
-                updateUiWithUser(loginResult.success)
+            if (registerResult.success != null) {
+                updateUiWithUser(registerResult.success)
+                val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+                startActivity(intent)
+                setResult(Activity.RESULT_OK)
+                //Complete and destroy login activity once successful
+                finish()
             }
-            setResult(Activity.RESULT_OK)
-
-            //Complete and destroy login activity once successful
-            finish()
         })
 
         login.setOnClickListener {
@@ -72,8 +73,17 @@ class RegisterActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        fullName.afterTextChanged {
+            registerViewModel.loginDataChanged(
+                fullName.text.toString(),
+                username.text.toString(),
+                password.text.toString()
+            )
+        }
+
         username.afterTextChanged {
-            loginViewModel.loginDataChanged(
+            registerViewModel.loginDataChanged(
+                fullName.text.toString(),
                 username.text.toString(),
                 password.text.toString()
             )
@@ -81,7 +91,8 @@ class RegisterActivity : AppCompatActivity() {
 
         password.apply {
             afterTextChanged {
-                loginViewModel.loginDataChanged(
+                registerViewModel.loginDataChanged(
+                    fullName.text.toString(),
                     username.text.toString(),
                     password.text.toString()
                 )
@@ -90,7 +101,8 @@ class RegisterActivity : AppCompatActivity() {
             setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE ->
-                        loginViewModel.login(
+                        registerViewModel.register(
+                            fullName.text.toString(),
                             username.text.toString(),
                             password.text.toString()
                         )
@@ -100,16 +112,14 @@ class RegisterActivity : AppCompatActivity() {
 
             register.setOnClickListener {
                 loading.visibility = View.VISIBLE
-                val intent = Intent(this@RegisterActivity, MainActivity::class.java)
-                startActivity(intent)
+                registerViewModel.register(fullName.text.toString(), username.text.toString(), password.text.toString())
             }
         }
     }
 
-    private fun updateUiWithUser(model: LoggedInUserView) {
+    private fun updateUiWithUser(model: RegisteredUserView) {
         val welcome = getString(R.string.welcome)
         val displayName = model.displayName
-        // TODO : initiate successful logged in experience
         Toast.makeText(
             applicationContext,
             "$welcome $displayName",
@@ -117,7 +127,7 @@ class RegisterActivity : AppCompatActivity() {
         ).show()
     }
 
-    private fun showLoginFailed(@StringRes errorString: Int) {
+    private fun showRegistrationFailed(@StringRes errorString: Int) {
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
     }
 }
