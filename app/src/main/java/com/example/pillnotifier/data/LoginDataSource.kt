@@ -1,9 +1,8 @@
 package com.example.pillnotifier.data
 
-import android.util.Log
 import com.example.pillnotifier.Constants
 import com.example.pillnotifier.data.model.LoggedInUser
-import com.example.pillnotifier.data.model.UserInfo
+import com.example.pillnotifier.model.UserInfo
 import com.google.gson.Gson
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull

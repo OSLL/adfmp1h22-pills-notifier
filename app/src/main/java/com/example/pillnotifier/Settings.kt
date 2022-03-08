@@ -9,13 +9,9 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import com.example.pillnotifier.data.Result
-import com.example.pillnotifier.data.model.LoggedInUser
-import com.example.pillnotifier.data.model.UserInfo
+import com.example.pillnotifier.model.UserInfo
 import com.example.pillnotifier.model.DataHolder
-import com.example.pillnotifier.ui.login.RegisterResult
-import com.example.pillnotifier.ui.login.RegisteredUserView
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

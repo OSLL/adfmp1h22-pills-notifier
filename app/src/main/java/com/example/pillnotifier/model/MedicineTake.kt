@@ -1,6 +1,4 @@
-package com.example.pillnotifier.model;
-
-import java.time.LocalDate
+package com.example.pillnotifier.model
 
 enum class TakeStatus {
     TAKEN,
@@ -8,4 +6,4 @@ enum class TakeStatus {
     UNKNOWN
 }
 
-class MedicineTake(val medicine: Medicine, val takeStatus: TakeStatus)
+class MedicineTake(val medicine: Medicine, val take_status: TakeStatus)

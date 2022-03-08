@@ -46,4 +46,5 @@
     <string name="register">Register</string>
     <string name="fullname">fullname</string>
     <string name="sign_up">Sign up</string>
+    <string name="schedule_failed">"Failed to update schedule"</string>
 </resources>

@@ -2,10 +2,14 @@ package com.example.pillnotifier.fragments
 
 import android.app.DatePickerDialog
 import android.app.Dialog
+import android.os.Build
 import android.os.Bundle
 import android.widget.DatePicker
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.DialogFragment
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class DatePickerFragment(val tvDate: TextView) : DialogFragment(), DatePickerDialog.OnDateSetListener {
@@ -26,8 +30,10 @@ class DatePickerFragment(val tvDate: TextView) : DialogFragment(), DatePickerDia
         )
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onDateSet(p0: DatePicker?, y: Int, m: Int, d: Int) {
-        tvDate.text = "$d/${m + 1}/$y"
+        tvDate.text = LocalDate.of(y, m + 1, d)
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString()
     }
 
 }

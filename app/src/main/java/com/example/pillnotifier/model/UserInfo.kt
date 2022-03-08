@@ -1,4 +1,4 @@
-package com.example.pillnotifier.data.model
+package com.example.pillnotifier.model
 
 import com.google.gson.annotations.SerializedName
 

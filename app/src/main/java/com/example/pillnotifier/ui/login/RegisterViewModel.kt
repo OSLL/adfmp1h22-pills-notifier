@@ -1,17 +1,15 @@
 package com.example.pillnotifier.ui.login
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import android.util.Patterns
 import androidx.lifecycle.viewModelScope
 import com.example.pillnotifier.Constants
 import com.example.pillnotifier.data.Result
 
 import com.example.pillnotifier.R
 import com.example.pillnotifier.data.model.LoggedInUser
-import com.example.pillnotifier.data.model.UserInfo
+import com.example.pillnotifier.model.UserInfo
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -34,12 +34,12 @@ class MedicineTakeAdapter (
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val medicineTake = medicines[position]
-        holder.medicineNameTV.text = medicineTake.medicine.name
+        holder.medicineNameTV.text = medicineTake.medicine.medicine_name
         holder.portionTV.text = medicineTake.medicine.portion
 
-        holder.takeTimeTV.text = medicineTake.medicine.takeTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+        holder.takeTimeTV.text = medicineTake.medicine.time!!.format(DateTimeFormatter.ofPattern("HH:mm"))
 
-        when (medicineTake.takeStatus) {
+        when (medicineTake.take_status) {
             TakeStatus.UNKNOWN -> {
                 holder.itemView.setBackgroundColor(context.resources.getColor(R.color.unknown_status))
                 if (rights == Rights.READ) {
