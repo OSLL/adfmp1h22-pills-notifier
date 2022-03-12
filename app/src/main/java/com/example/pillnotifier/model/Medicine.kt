@@ -23,22 +23,22 @@ class Medicine {
     var portion: Portion? = null
     var time: String? = null
     var regularity: Regularity? = null
-    var date: String? = null
-    var instructions: String? = null
+    var start_date: String? = null
+    var end_date: String? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     constructor(medicine_name: String,
                 portion: Portion,
                 time: String,
                 regularity: Regularity,
-                date: String,
-                instructions: String) {
+                start_date: String,
+                end_date: String) {
         this.medicine_name = medicine_name
         this.portion = portion
         this.regularity = regularity
-        this.instructions = instructions
         this.time = time
-        this.date = date
+        this.start_date = start_date
+        this.end_date = end_date
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -46,8 +46,9 @@ class Medicine {
                 portion: Portion,
                 time: LocalTime,
                 regularity: Regularity,
-                date: LocalDate,
-                instructions: String) :
+                start_date: LocalDate,
+                end_date: LocalDate) :
         this(medicine_name=medicine_name, portion=portion, time=time.format(timeFormat),
-            regularity=regularity, date=date.format(dateFormat), instructions=instructions)
+            regularity=regularity, start_date=start_date.format(dateFormat),
+            end_date=end_date.format(dateFormat))
 }

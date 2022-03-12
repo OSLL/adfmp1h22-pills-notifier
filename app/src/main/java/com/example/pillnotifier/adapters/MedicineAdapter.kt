@@ -26,9 +26,9 @@ class MedicineAdapter(context: Context, private val medicine: List<Medicine>) : 
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val medicine = medicine.get(position)
+        val medicine = medicine[position]
         holder.medicineName.text = medicine.medicine_name
-        holder.instructions.text = medicine.instructions
+        holder.portion.text = medicine.portion
         holder.regularityAndTakeTime.text = medicine.regularity!!.stringInterpretation +
                 " at " + medicine.time!!.format(DateTimeFormatter.ofPattern("HH:mm"))
         holder.deleteButton.setOnClickListener {
@@ -47,7 +47,7 @@ class MedicineAdapter(context: Context, private val medicine: List<Medicine>) : 
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val medicineName: TextView = itemView.findViewById(R.id.medicine_name)
-        val instructions: TextView = itemView.findViewById(R.id.medicine_instructions)
+        val portion: TextView = itemView.findViewById(R.id.medicine_portion)
         val regularityAndTakeTime: TextView = itemView.findViewById(R.id.regularity_ant_take_time)
         val deleteButton: ImageButton = itemView.findViewById(R.id.button_delete)
         val editButton: ImageButton = itemView.findViewById(R.id.button_edit)

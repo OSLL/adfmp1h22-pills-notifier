@@ -39,12 +39,15 @@ class MedicineTakeAdapter (
 
         holder.takeTimeTV.text = medicineTake.medicine.time!!.format(DateTimeFormatter.ofPattern("HH:mm"))
 
+        holder.itemView.setBackgroundColor(context.resources.getColor(R.color.white))
+        holder.takenIV.visibility = View.VISIBLE
+        holder.notTakenIV.visibility = View.VISIBLE
         when (medicineTake.take_status) {
             TakeStatus.UNKNOWN -> {
                 holder.itemView.setBackgroundColor(context.resources.getColor(R.color.unknown_status))
                 if (rights == Rights.READ) {
-                    holder.takenIV.visibility = View.INVISIBLE
-                    holder.notTakenIV.visibility = View.INVISIBLE
+                        holder.takenIV.visibility = View.INVISIBLE
+                        holder.notTakenIV.visibility = View.INVISIBLE
                 }
             }
             TakeStatus.TAKEN -> holder.notTakenIV.visibility = View.INVISIBLE

@@ -26,13 +26,9 @@ class MedicineFragment : Fragment() {
 
     init {
         val medicine = Medicine("Vitamin A", "4 pills", LocalTime.of(8, 0), Regularity.DAILY,
-            LocalDate.of(2022, Month.JANUARY, 1), "Take 4 pills")
+            LocalDate.of(2022, Month.JANUARY, 1), LocalDate.of(2022, Month.JANUARY, 1))
         for (i in 1..20)
             medicinesList.add(medicine)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(
