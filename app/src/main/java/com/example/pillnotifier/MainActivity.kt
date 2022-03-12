@@ -3,6 +3,7 @@ package com.example.pillnotifier
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -52,13 +53,15 @@ class MainActivity : AppCompatActivity() {
         viewPager2.adapter = viewPagerAdapter
 
         TabLayoutMediator(tabLayout, viewPager2) {
-            tab, position -> tab.text = when(position) {
-                0 -> "Dependents"
-                1 -> "Schedule"
-                2 -> "Medicine"
-                3 -> "Explore"
-                else -> "None"
+            tab, position ->
+            val iconId = when (position) {
+                0 -> R.drawable.dependents_icon
+                1 -> R.drawable.schedulte_icon
+                2 -> R.drawable.medicine_icon
+                3 -> R.drawable.explore_icon
+                else -> -1
             }
+            tab.setIcon(iconId)
         }.attach()
 
         mDrawerLayout = findViewById(R.id.drawerLayout)
