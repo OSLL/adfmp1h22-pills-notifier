@@ -40,5 +40,7 @@
     <string name="fullname">fullname</string>
     <string name="sign_up">Sign up</string>
     <string name="schedule_failed">"Failed to update schedule"</string>
+    <string name="status_update_failed">"Failed to update medicine take status"</string>
     <string name="medicines_failed">"Failed to update medicines list"</string>
+    <string name="regularity">Daily</string>
 </resources>
