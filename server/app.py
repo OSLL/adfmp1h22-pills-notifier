@@ -15,6 +15,7 @@ app = Flask(__name__)
 
 test_medicine_id = str(uuid.uuid4())
 test_user_id = str(uuid.uuid4())
+snd_user_id = str(uuid.uuid4())
 
 medicine_id_to_medicine_info: Dict[str, MedicineInfo] = {
     test_medicine_id: MedicineInfo("Vitamin B", "portion", Regularity.ONCE_A_WEEK, date(2022, 3, 8),
@@ -24,7 +25,10 @@ user_to_medicine_ids: Dict[str, List[str]] = {
     test_user_id: [test_medicine_id]
 }
 
-users_list: Dict[str, UserInfo] = {test_user_id: UserInfo('test_user', 'test_user', '123456')}
+users_list: Dict[str, UserInfo] = {test_user_id: UserInfo('test_user', 'test_user', '123456'),
+                                   snd_user_id: UserInfo('snd_user', 'snd_user', '123456')}
+username_to_uuid: Dict[str, str] = {'test_user': test_user_id,
+                                    'snd_user': snd_user_id}
 users_to_dependents: Dict[str, List[str]] = {}
 users_to_observers: Dict[str, List[str]] = {}
 users_to_incoming_request: Dict[str, List[str]] = {}
@@ -207,6 +211,7 @@ def register():
                 return 'Username already taken', 404
         user_id = str(uuid.uuid4())
         users_list[user_id] = UserInfo(full_name, username, password)
+        username_to_uuid[username] = user_id
         result = {'userId': user_id, 'fullname': full_name, 'username': username}
         return json.dumps(result), 200
     else:
@@ -230,6 +235,8 @@ def update():
         user.username = username
         user.fullname = full_name
         users_list[user_id] = user
+        username_to_uuid.pop(username)
+        username_to_uuid[username] = user_id
         return 'OK', 200
     else:
         return 'Content-Type not supported!', 404
@@ -242,12 +249,20 @@ def dependent_send_request():
     if content_type.startswith('application/json'):
         json_request = request.json
         user_id = json_request['user_id']
-        dependent_id = json_request['dependent_id']
+        dependent_username = json_request['dependent_username']
+        if dependent_username not in username_to_uuid:
+            return f'Could not find user {dependent_username}', 404
+        dependent_id = username_to_uuid[dependent_username]
         if dependent_id not in users_list:
-            return f'Could not find user {dependent_id}', 404
+            return f'Could not find user {dependent_username}', 404
+        if user_id not in users_to_outgoing_request:
+            users_to_outgoing_request[user_id] = []
         users_to_outgoing_request[user_id].append(dependent_id)
+
+        if dependent_id not in users_to_incoming_request:
+            users_to_incoming_request[dependent_id] = []
         users_to_incoming_request[dependent_id].append(user_id)
-        return f'Request to {user_id} was sent', 200
+        return f'Request to {dependent_username} was sent', 200
     else:
         return 'Content-Type not supported!', 404
 
@@ -259,16 +274,19 @@ def accept_observer_request():
     if content_type.startswith('application/json'):
         json_request = request.json
         user_id = json_request['user_id']
-        observer_id = json_request['observer_id']
+        observer_username = json_request['observer_username']
+        if observer_username not in username_to_uuid:
+            return f'Could not find user {observer_username}', 404
+        observer_id = username_to_uuid[observer_username]
         if observer_id not in users_list:
-            return f'Could not find user {observer_id}', 404
+            return f'Could not find user {observer_username}', 404
         if observer_id not in users_to_incoming_request:
-            return f'User {observer_id} declined his request', 200
+            return f'User {observer_username} declined his request', 200
         users_to_incoming_request[user_id].remove(observer_id)
         users_to_observers[user_id].append(observer_id)
         users_to_outgoing_request[observer_id].remove(user_id)
         users_to_dependents[observer_id].append(user_id)
-        return f'User {user_id} added to observers', 200
+        return f'User {observer_username} added to observers', 200
     else:
         return 'Content-Type not supported!', 404
 
@@ -280,14 +298,17 @@ def decline_observer_request():
     if content_type.startswith('application/json'):
         json_request = request.json
         user_id = json_request['user_id']
-        observer_id = json_request['observer_id']
+        observer_username = json_request['observer_username']
+        if observer_username not in username_to_uuid:
+            return f'Could not find user {observer_username}', 404
+        observer_id = username_to_uuid[observer_username]
         if observer_id not in users_list:
-            return f'Could not find user {observer_id}', 404
+            return f'Could not find user {observer_username}', 404
         if observer_id not in users_to_incoming_request[user_id]:
-            return f'User {observer_id} already declined his request', 200
+            return f'User {observer_username} already declined his request', 200
         users_to_incoming_request[user_id].remove(observer_id)
         users_to_outgoing_request[observer_id].remove(user_id)
-        return f'Request from user {user_id} declined', 200
+        return f'Request from user {observer_username} declined', 200
     else:
         return 'Content-Type not supported!', 404
 
@@ -299,14 +320,17 @@ def withdraw_outgoing_request():
     if content_type.startswith('application/json'):
         json_request = request.json
         user_id = json_request['user_id']
-        dependent_id = json_request['dependent_id']
+        dependent_username = json_request['dependent_username']
+        if dependent_username not in username_to_uuid:
+            return f'Could not find user {dependent_username}', 404
+        dependent_id = username_to_uuid[dependent_username]
         if dependent_id not in users_list:
-            return f'Could not find user {dependent_id}', 404
+            return f'Could not find user {dependent_username}', 404
         if dependent_id not in users_to_outgoing_request[user_id]:
-            return f'User {dependent_id} already processed your request', 200
+            return f'User {dependent_username} already processed your request', 200
         users_to_incoming_request[dependent_id].remove(user_id)
         users_to_outgoing_request[user_id].remove(dependent_id)
-        return f'Request to user {dependent_id} canceled', 200
+        return f'Request to user {dependent_username} canceled', 200
     else:
         return 'Content-Type not supported!', 404
 
@@ -318,14 +342,17 @@ def dependent_remove():
     if content_type.startswith('application/json'):
         json_request = request.json
         user_id = json_request['user_id']
-        dependent_id = json_request['dependent_id']
+        dependent_username = json_request['dependent_username']
+        if dependent_username not in username_to_uuid:
+            return f'Could not find user {dependent_username}', 404
+        dependent_id = username_to_uuid[dependent_username]
         if dependent_id not in users_list:
-            return f'Could not find user {dependent_id}', 404
+            return f'Could not find user {dependent_username}', 404
         if dependent_id not in users_to_dependents[user_id]:
-            return f'User {dependent_id} already removed', 200
+            return f'User {dependent_username} already removed', 200
         users_to_dependents[user_id].remove(dependent_id)
         users_to_observers[dependent_id].remove(user_id)
-        return f'User {dependent_id} successfully removed', 200
+        return f'User {dependent_username} successfully removed', 200
     else:
         return 'Content-Type not supported!', 404
 
@@ -337,14 +364,17 @@ def observer_remove():
     if content_type.startswith('application/json'):
         json_request = request.json
         user_id = json_request['user_id']
-        observer_id = json_request['observer_id']
+        observer_username = json_request['observer_username']
+        if observer_username not in username_to_uuid:
+            return f'Could not find user {observer_username}', 404
+        observer_id = username_to_uuid[observer_username]
         if observer_id not in users_list:
-            return f'Could not find user {observer_id}', 404
+            return f'Could not find user {observer_username}', 404
         if observer_id not in users_to_observers[user_id]:
-            return f'User {observer_id} already removed', 200
+            return f'User {observer_username} already removed', 200
         users_to_observers[user_id].remove(observer_id)
         users_to_dependents[observer_id].remove(user_id)
-        return f'User {observer_id} successfully removed', 200
+        return f'User {observer_username} successfully removed', 200
     else:
         return 'Content-Type not supported!', 404
 
