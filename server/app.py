@@ -26,6 +26,9 @@ user_to_medicine_ids: Dict[str, List[str]] = {
 
 users_list: Dict[str, UserInfo] = {test_user_id: UserInfo('test_user', 'test_user', '123456')}
 users_to_dependents: Dict[str, List[str]] = {}
+users_to_observers: Dict[str, List[str]] = {}
+users_to_incoming_request: Dict[str, List[str]] = {}
+users_to_outgoing_request: Dict[str, List[str]] = {}
 
 # { date : {user: { medicine_id: TakeStatus } } }
 date_to_medicine_status: Dict[date, Dict[str, Dict[str, TakeStatus]]] = {
@@ -201,6 +204,120 @@ def update():
         user.fullname = full_name
         users_list[user_id] = user
         return 'OK', 200
+    else:
+        return 'Content-Type not supported!', 404
+
+
+# Add dependent -> Send
+@app.route('/dependent/send', methods=['POST'])
+def dependent_send_request():
+    content_type = request.headers.get('Content-Type')
+    if content_type.startswith('application/json'):
+        json_request = request.json
+        user_id = json_request['user_id']
+        dependent_id = json_request['dependent_id']
+        if dependent_id not in users_list:
+            return f'Could not find user {dependent_id}', 404
+        users_to_outgoing_request[user_id].append(dependent_id)
+        users_to_incoming_request[dependent_id].append(user_id)
+        return f'Request to {user_id} was sent', 200
+    else:
+        return 'Content-Type not supported!', 404
+
+
+# Incoming requests -> accept
+@app.route('/incoming/accept', methods=['POST'])
+def accept_observer_request():
+    content_type = request.headers.get('Content-Type')
+    if content_type.startswith('application/json'):
+        json_request = request.json
+        user_id = json_request['user_id']
+        observer_id = json_request['observer_id']
+        if observer_id not in users_list:
+            return f'Could not find user {observer_id}', 404
+        if observer_id not in users_to_incoming_request:
+            return f'User {observer_id} declined his request', 200
+        users_to_incoming_request[user_id].remove(observer_id)
+        users_to_observers[user_id].append(observer_id)
+        users_to_outgoing_request[observer_id].remove(user_id)
+        users_to_dependents[observer_id].append(user_id)
+        return f'User {user_id} added to observers', 200
+    else:
+        return 'Content-Type not supported!', 404
+
+
+# Incoming requests -> decline
+@app.route('/incoming/decline', methods=['POST'])
+def decline_observer_request():
+    content_type = request.headers.get('Content-Type')
+    if content_type.startswith('application/json'):
+        json_request = request.json
+        user_id = json_request['user_id']
+        observer_id = json_request['observer_id']
+        if observer_id not in users_list:
+            return f'Could not find user {observer_id}', 404
+        if observer_id not in users_to_incoming_request[user_id]:
+            return f'User {observer_id} already declined his request', 200
+        users_to_incoming_request[user_id].remove(observer_id)
+        users_to_outgoing_request[observer_id].remove(user_id)
+        return f'Request from user {user_id} declined', 200
+    else:
+        return 'Content-Type not supported!', 404
+
+
+# Outgoing requests -> withdraw
+@app.route('/outgoing/withdraw', methods=['POST'])
+def withdraw_outgoing_request():
+    content_type = request.headers.get('Content-Type')
+    if content_type.startswith('application/json'):
+        json_request = request.json
+        user_id = json_request['user_id']
+        dependent_id = json_request['dependent_id']
+        if dependent_id not in users_list:
+            return f'Could not find user {dependent_id}', 404
+        if dependent_id not in users_to_outgoing_request[user_id]:
+            return f'User {dependent_id} already processed your request', 200
+        users_to_incoming_request[dependent_id].remove(user_id)
+        users_to_outgoing_request[user_id].remove(dependent_id)
+        return f'Request to user {dependent_id} canceled', 200
+    else:
+        return 'Content-Type not supported!', 404
+
+
+# Dependents -> remove
+@app.route('/dependent/remove', methods=['POST'])
+def dependent_remove():
+    content_type = request.headers.get('Content-Type')
+    if content_type.startswith('application/json'):
+        json_request = request.json
+        user_id = json_request['user_id']
+        dependent_id = json_request['dependent_id']
+        if dependent_id not in users_list:
+            return f'Could not find user {dependent_id}', 404
+        if dependent_id not in users_to_dependents[user_id]:
+            return f'User {dependent_id} already removed', 200
+        users_to_dependents[user_id].remove(dependent_id)
+        users_to_observers[dependent_id].remove(user_id)
+        return f'User {dependent_id} successfully removed', 200
+    else:
+        return 'Content-Type not supported!', 404
+
+
+# Observers -> remove
+@app.route('/observer/remove', methods=['POST'])
+def observer_remove():
+    content_type = request.headers.get('Content-Type')
+    if content_type.startswith('application/json'):
+        json_request = request.json
+        user_id = json_request['user_id']
+        observer_id = json_request['observer_id']
+        if observer_id not in users_list:
+            return f'Could not find user {observer_id}', 404
+        if observer_id not in users_to_observers[user_id]:
+            return f'User {observer_id} already removed', 200
+        users_to_observers[user_id].remove(observer_id)
+        users_to_dependents[observer_id].remove(user_id)
+        return f'User {observer_id} successfully removed', 200
     else:
         return 'Content-Type not supported!', 404
 
