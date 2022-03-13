@@ -6,4 +6,4 @@ enum class TakeStatus {
     UNKNOWN
 }
 
-class MedicineTake(val medicine: Medicine, val take_status: TakeStatus)
+class MedicineTake(val medicine: Medicine, var take_status: TakeStatus, val date: String)

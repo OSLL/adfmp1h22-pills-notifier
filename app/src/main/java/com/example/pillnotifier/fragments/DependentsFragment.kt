@@ -26,9 +26,9 @@ class DependentsFragment : Fragment() {
         val medicineTakeList: MutableList<MedicineTake> = mutableListOf()
         val medicine = Medicine("","Vitamin A", "4 pills", LocalTime.of(8, 0), Regularity.DAILY,
             LocalDate.of(2022, Month.JANUARY, 1), LocalDate.of(2022, Month.JANUARY, 1))
-        medicineTakeList.add(MedicineTake(medicine, TakeStatus.TAKEN))
-        medicineTakeList.add(MedicineTake(medicine, TakeStatus.NOT_TAKEN))
-        medicineTakeList.add(MedicineTake(medicine, TakeStatus.UNKNOWN))
+        medicineTakeList.add(MedicineTake(medicine, TakeStatus.TAKEN, "2021-04-05"))
+        medicineTakeList.add(MedicineTake(medicine, TakeStatus.NOT_TAKEN, "2021-04-05"))
+        medicineTakeList.add(MedicineTake(medicine, TakeStatus.UNKNOWN, "2021-04-05"))
 
         val dependentWithTakes = DependentWithTakes(
             Profile("Kimberly White", "kwhite"),

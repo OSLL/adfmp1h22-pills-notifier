@@ -128,14 +128,41 @@ def get_schedule():
     take_date = request.args.get('date')
     if take_date is None:
         return 'Date must be provided', 400
-    take_date = datetime.strptime(take_date, '%Y-%m-%d').date()
+    take_date_datetime = datetime.strptime(take_date, '%Y-%m-%d').date()
     if user_id not in users_list:
         return f'User with id {user_id} not found', 404
     return flask.jsonify(
         [{'medicine': from_medicine_id_to_medicine_id_and_info_json(medicine_id),
-          'take_status': take_status}
-         for medicine_id, take_status in date_to_medicine_status.get(take_date, {}).get(user_id, {}).items()]
+          'take_status': take_status,
+          'date': take_date
+          }
+         for medicine_id, take_status in date_to_medicine_status.get(take_date_datetime, {}).get(user_id, {}).items()]
     ), 200
+
+
+@app.route('/medicine/status', methods=['POST'])
+def add_status():
+    content_type = request.headers.get('Content-Type')
+    if content_type.startswith('application/json'):
+        json_request = request.json
+        if 'user_id' not in json_request:
+            return 'User id must be provided', 400
+        if 'date' not in json_request:
+            return 'Date must be provided', 400
+        if 'medicine_id' not in json_request:
+            return 'Medicine id must be provided', 400
+        if 'medicine_status' not in json_request:
+            return 'Status id must be provided', 400
+        user_id = json_request['user_id']
+        if user_id not in users_list:
+            return f'User with id {user_id} not found', 404
+        medicine_date = datetime.strptime(json_request['date'], '%Y-%m-%d').date()
+        medicine_id = json_request['medicine_id']
+        medicine_status = TakeStatus[json_request['medicine_status']]
+        date_to_medicine_status[medicine_date][user_id][medicine_id] = medicine_status
+        return 'OK', 200
+    else:
+        return 'Content-Type not supported!', 404
 
 
 @app.route('/medicines', methods=['GET'])

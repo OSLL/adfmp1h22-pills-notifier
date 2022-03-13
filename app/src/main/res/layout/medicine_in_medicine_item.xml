@@ -49,8 +49,6 @@
             android:textColor="@color/grey"
             android:textSize="20sp"
             app:layout_constraintLeft_toLeftOf="parent"
-
-
             app:layout_constraintTop_toTopOf="@+id/take_time_tv" />
     </LinearLayout>
 
