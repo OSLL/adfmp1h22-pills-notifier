@@ -6,8 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".fragments.MedicineFragment">
 
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        />
+
     <LinearLayout
-        android:id="@+id/schedule_calendar"
+        android:id="@+id/medicine_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"

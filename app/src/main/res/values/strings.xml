@@ -10,13 +10,6 @@
     <string name="date">7 February at 15:40</string>
     <string name="medicine_name">Vitamin A</string>
     <string name="instructions">Take 2 pills</string>
-    <string name="regularity">Daily</string>
-    <string-array name="names">
-        <item>Please select regularity</item>
-        <item>Daily</item>
-        <item>Once in two days</item>
-        <item>Once a week</item>
-    </string-array>
     <string name="medicine_name_example">Vitamin A</string>
     <string name="medicine_portion_example">4 pills</string>
     <string name="take_time_example">08:00</string>
@@ -47,4 +40,5 @@
     <string name="fullname">fullname</string>
     <string name="sign_up">Sign up</string>
     <string name="schedule_failed">"Failed to update schedule"</string>
+    <string name="medicines_failed">"Failed to update medicines list"</string>
 </resources>

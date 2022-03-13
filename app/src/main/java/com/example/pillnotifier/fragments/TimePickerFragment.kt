@@ -2,10 +2,15 @@ package com.example.pillnotifier.fragments
 
 import android.app.Dialog
 import android.app.TimePickerDialog
+import android.os.Build
 import android.os.Bundle
 import android.widget.TextView
 import android.widget.TimePicker
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.DialogFragment
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class TimePickerFragment(val tvTime: TextView) : DialogFragment(), TimePickerDialog.OnTimeSetListener {
@@ -25,7 +30,8 @@ class TimePickerFragment(val tvTime: TextView) : DialogFragment(), TimePickerDia
         )
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onTimeSet(p0: TimePicker?, p1: Int, p2: Int) {
-        tvTime.text = "$p1:$p2"
+        tvTime.text = LocalTime.of(p1, p2).format(DateTimeFormatter.ofPattern("HH:mm")).toString()
     }
 }
