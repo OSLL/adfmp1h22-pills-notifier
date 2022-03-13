@@ -10,6 +10,7 @@
     <string name="date">7 February at 15:40</string>
     <string name="medicine_name">Vitamin A</string>
     <string name="instructions">Take 2 pills</string>
+    <string name="regularity">Daily</string>
     <string name="medicine_name_example">Vitamin A</string>
     <string name="medicine_portion_example">4 pills</string>
     <string name="take_time_example">08:00</string>
