@@ -6,24 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pillnotifier.Constants
 import com.example.pillnotifier.R
-import com.example.pillnotifier.data.Result
-import com.example.pillnotifier.data.model.LoggedInUser
 import com.example.pillnotifier.model.*
-import com.google.gson.Gson
 import kotlinx.coroutines.*
 import okhttp3.*
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
@@ -110,7 +103,7 @@ class MedicineTakeAdapter(
         Toast.makeText(context, errorString, Toast.LENGTH_SHORT).show()
     }
 
-    fun updateStatus(status: TakeStatus, dateString: String, medicineId: String?) {
+    private fun updateStatus(status: TakeStatus, dateString: String, medicineId: String?) {
         CoroutineScope(Dispatchers.IO).launch {
             val result: RequestResult = withContext(Dispatchers.IO) {
                 suspendCoroutine { cont ->

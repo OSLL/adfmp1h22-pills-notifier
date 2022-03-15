@@ -1,7 +1,6 @@
 package com.example.pillnotifier.adapters.holders
 
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import com.example.pillnotifier.R
 import com.example.pillnotifier.model.Profile

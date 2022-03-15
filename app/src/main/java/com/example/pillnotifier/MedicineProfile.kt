@@ -82,13 +82,13 @@ class MedicineProfile : AppCompatActivity() {
             }
         }
 
-        submitButton!!.setOnClickListener {
+        submitButton.setOnClickListener {
             when (mode) {
                 Mode.CREATE -> {
                     // TODO call of server
                     loading.visibility = View.VISIBLE
                     lifecycleScope.launch {
-                        var errorMsg: String? = withContext(Dispatchers.IO) {
+                        val errorMsg: String? = withContext(Dispatchers.IO) {
                             suspendCoroutine { cont ->
                                 if (medicineInput.text.toString().isEmpty()) {
                                     cont.resume("Medicine name is empty")
@@ -114,7 +114,7 @@ class MedicineProfile : AppCompatActivity() {
                                     cont.resume("Fail to build URL for server calling")
                                     return@suspendCoroutine
                                 }
-                                val httpUrlBuilder: HttpUrl.Builder = httpUrl!!.newBuilder()
+                                val httpUrlBuilder: HttpUrl.Builder = httpUrl.newBuilder()
 
                                 val jsonObject = JSONObject();
                                 jsonObject.put("user_id", DataHolder.getData("userId"))

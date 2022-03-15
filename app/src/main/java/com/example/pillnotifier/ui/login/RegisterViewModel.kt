@@ -29,7 +29,7 @@ class RegisterViewModel() : ViewModel() {
     private val _registerResult = MutableLiveData<RegisterResult>()
     val registerResult: LiveData<RegisterResult> = _registerResult
 
-    suspend fun _register(
+    private suspend fun _register(
         fullname: String,
         username: String,
         password: String

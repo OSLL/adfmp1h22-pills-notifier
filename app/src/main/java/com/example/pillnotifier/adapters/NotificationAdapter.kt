@@ -19,7 +19,7 @@ class NotificationAdapter(context: Context, private val notifications: List<Noti
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val notification = notifications.get(position)
+        val notification = notifications[position]
         holder.notification_message.text = notification.message
         val df = SimpleDateFormat("HH:mm", Locale.getDefault())
         holder.notification_date.text = df.format(notification.date)

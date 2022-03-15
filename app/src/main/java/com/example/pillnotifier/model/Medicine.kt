@@ -24,8 +24,8 @@ class Medicine {
     var portion: Portion? = null
     var time: String? = null
     var regularity: Regularity? = null
-    var start_date: String? = null
-    var end_date: String? = null
+    private var start_date: String? = null
+    private var end_date: String? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     constructor(medicine_id: String,
