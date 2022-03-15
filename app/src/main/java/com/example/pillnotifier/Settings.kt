@@ -26,14 +26,14 @@ import kotlin.coroutines.suspendCoroutine
 
 class Settings : AppCompatActivity() {
     var name: String? = null
-    var link: String? = null
+    private var link: String? = null
 
-    var nameInput: EditText? = null
-    var linkInput: EditText? = null
+    private var nameInput: EditText? = null
+    private var linkInput: EditText? = null
 
-    var submitButton: Button? = null
+    private var submitButton: Button? = null
 
-    suspend fun _updateUserInfo(
+    private suspend fun _updateUserInfo(
         fullname: String?,
         username: String?
     ): Result<String> {

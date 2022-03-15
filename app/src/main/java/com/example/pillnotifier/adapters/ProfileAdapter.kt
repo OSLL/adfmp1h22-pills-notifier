@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.pillnotifier.R
 import com.example.pillnotifier.adapters.holders.AbstractProfileViewHolder
 import com.example.pillnotifier.model.Profile
 

@@ -31,7 +31,8 @@ users_list: Dict[str, UserInfo] = {test_user_id: UserInfo('test_user', 'test_use
                                    snd_user_id: UserInfo('snd_user', 'snd_user', '123456'),
                                    test_observer_id: UserInfo('test_observer', 'test_observer', '123456')}
 username_to_uuid: Dict[str, str] = {'test_user': test_user_id,
-                                    'snd_user': snd_user_id}
+                                    'snd_user': snd_user_id,
+                                    'test_observer': test_observer_id}
 users_to_dependents: Dict[str, List[str]] = {}
 users_to_observers: Dict[str, List[str]] = {test_user_id: [test_observer_id]}
 users_to_incoming_request: Dict[str, List[str]] = {}
@@ -271,6 +272,8 @@ def dependent_send_request():
         dependent_id = username_to_uuid[dependent_username]
         if dependent_id not in users_list:
             return f'Could not find user {dependent_username}', 404
+        if user_id == dependent_id:
+            return f'Could not send request to yourself', 404
         if user_id not in users_to_outgoing_request:
             users_to_outgoing_request[user_id] = []
         users_to_outgoing_request[user_id].append(dependent_id)

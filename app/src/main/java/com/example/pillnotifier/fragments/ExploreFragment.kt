@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.pillnotifier.Constants
 import com.example.pillnotifier.R
 import com.example.pillnotifier.adapters.ProfileAdapter
@@ -48,6 +49,7 @@ class ExploreFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_explore, container, false)
         val exploreListLL: LinearLayout = view.findViewById(R.id.explore_list)
+        val swipeRefresh: SwipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
 
         val recyclerView: RecyclerView = view.findViewById(R.id.profiles_lists_rv)
         val loading = view.findViewById<ProgressBar>(R.id.loading)
@@ -135,7 +137,8 @@ class ExploreFragment : Fragment() {
                 )
                 recyclerView.adapter!!.notifyDataSetChanged()
             } else if (result.error != null) {
-                Toast.makeText(context, result.error, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, result.error
+                    , Toast.LENGTH_SHORT).show()
             }
             loading.visibility = View.GONE
             exploreListLL.visibility = View.VISIBLE
@@ -205,7 +208,90 @@ class ExploreFragment : Fragment() {
             }
         }
 
+        swipeRefresh.setOnRefreshListener {
+            loading.visibility = View.VISIBLE
+            lifecycleScope.launch {
+                val result: ExploreListResult = withContext(Dispatchers.IO) {
+                    suspendCoroutine { cont ->
+                        val client = OkHttpClient.Builder().build()
 
+                        val httpUrl: HttpUrl? = (Constants.BASE_URL + "/explore").toHttpUrlOrNull()
+                        if (httpUrl == null) {
+                            cont.resume(ExploreListResult(error = R.string.explore_failed))
+                        }
+
+                        val httpUrlBuilder: HttpUrl.Builder = httpUrl!!.newBuilder()
+                        httpUrlBuilder.addQueryParameter("user_id", DataHolder.getData("userId"))
+
+                        val request: Request = Request.Builder()
+                            .url(httpUrlBuilder.build())
+                            .build()
+
+                        client.newCall(request).enqueue(object : Callback {
+                            override fun onFailure(call: Call, e: IOException) {
+                                cont.resume(ExploreListResult(error = R.string.explore_failed))
+                            }
+
+                            override fun onResponse(call: Call, response: Response) {
+                                val message: String = response.body!!.string()
+                                val gson = Gson()
+                                if (response.code == 200) {
+                                    val expList =
+                                        gson.fromJson(message, Array<ProfilesList>::class.java)
+                                            .toMutableList()
+                                    cont.resume(ExploreListResult(success = expList))
+                                } else {
+                                    onFailure(call, IOException(message))
+                                }
+                            }
+                        })
+                    }
+                }
+                if (result.success != null) {
+                    profilesListWithAdaptCreators.clear()
+                    profilesListWithAdaptCreators.addAll(
+                        listOf(
+                            Pair(result.success[0]) { c, pl ->
+                                ProfileAdapter(
+                                    c,
+                                    pl,
+                                    R.layout.removable_user_list_item
+                                ) { v -> SimpleProfileHolder(v) }
+                            },
+
+                            Pair(result.success[1]) { c, pl ->
+                                ProfileAdapter(
+                                    c,
+                                    pl,
+                                    R.layout.removable_user_list_item
+                                ) { v -> SimpleProfileHolder(v) }
+                            },
+
+                            Pair(result.success[2]) { c, pl ->
+                                ProfileAdapter(
+                                    c,
+                                    pl,
+                                    R.layout.incoming_request_item
+                                ) { v -> SimpleProfileHolder(v) }
+                            },
+
+                            Pair(result.success[3]) { c, pl ->
+                                ProfileAdapter(
+                                    c,
+                                    pl,
+                                    R.layout.outgoing_request_item
+                                ) { v -> SimpleProfileHolder(v) }
+                            },
+                        )
+                    )
+                    recyclerView.adapter!!.notifyDataSetChanged()
+                } else if (result.error != null) {
+                    Toast.makeText(context, result.error, Toast.LENGTH_SHORT).show()
+                }
+            }
+            loading.visibility = View.GONE
+            swipeRefresh.isRefreshing = false
+        }
         return view
     }
 

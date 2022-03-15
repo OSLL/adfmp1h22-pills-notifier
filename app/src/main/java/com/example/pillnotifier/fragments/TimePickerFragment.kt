@@ -8,12 +8,11 @@ import android.widget.TextView
 import android.widget.TimePicker
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.DialogFragment
-import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class TimePickerFragment(val tvTime: TextView) : DialogFragment(), TimePickerDialog.OnTimeSetListener {
+class TimePickerFragment(private val tvTime: TextView) : DialogFragment(), TimePickerDialog.OnTimeSetListener {
     private lateinit var calendar : Calendar
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         calendar = Calendar.getInstance()

@@ -12,7 +12,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class DatePickerFragment(val tvDate: TextView) : DialogFragment(), DatePickerDialog.OnDateSetListener {
+class DatePickerFragment(private val tvDate: TextView) : DialogFragment(), DatePickerDialog.OnDateSetListener {
     private lateinit var calendar : Calendar
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         calendar = Calendar.getInstance()

@@ -19,10 +19,10 @@ class ProfilesListAdapter<ViewHolderType : AbstractProfileViewHolder>(
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): ProfilesListAdapter.ViewHolder {
+    ): ViewHolder {
         val view: View =
             LayoutInflater.from(context).inflate(R.layout.profiles_list, parent, false)
-        return ProfilesListAdapter.ViewHolder(view)
+        return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
