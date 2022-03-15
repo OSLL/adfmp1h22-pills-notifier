@@ -6,7 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".fragments.ExploreFragment">
 
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        />
+
     <LinearLayout
+        android:id="@+id/explore_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -50,11 +58,4 @@
 
     </LinearLayout>
 
-
-    <ProgressBar
-        android:id="@+id/loading"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        />
 </RelativeLayout>

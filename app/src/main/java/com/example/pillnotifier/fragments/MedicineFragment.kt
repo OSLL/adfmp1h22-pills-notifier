@@ -3,8 +3,6 @@ package com.example.pillnotifier.fragments
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +12,8 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pillnotifier.Constants
@@ -28,9 +28,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.io.IOException
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.Month
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 

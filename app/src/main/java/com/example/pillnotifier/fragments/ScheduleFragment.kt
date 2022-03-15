@@ -2,7 +2,6 @@ package com.example.pillnotifier.fragments
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,24 +19,16 @@ import com.example.pillnotifier.Constants
 import com.example.pillnotifier.R
 import com.example.pillnotifier.adapters.MedicineTakeAdapter
 import com.example.pillnotifier.adapters.Rights
-import com.example.pillnotifier.data.model.LoggedInUser
 import com.example.pillnotifier.model.*
-import com.example.pillnotifier.ui.login.RegisterResult
-import com.example.pillnotifier.ui.login.RegisteredUserView
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
-import java.time.LocalDate
-import java.time.LocalTime
 import java.util.*
 import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 

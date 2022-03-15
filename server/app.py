@@ -7,6 +7,7 @@ import json
 from flask import Flask, request
 from typing import Dict, List
 from models.medicine_info import Regularity, MedicineInfo
+from models.profile import Profile
 from models.user_info import UserInfo
 from models.take_status import TakeStatus
 
@@ -16,6 +17,7 @@ app = Flask(__name__)
 test_medicine_id = str(uuid.uuid4())
 test_user_id = str(uuid.uuid4())
 snd_user_id = str(uuid.uuid4())
+test_observer_id = str(uuid.uuid4())
 
 medicine_id_to_medicine_info: Dict[str, MedicineInfo] = {
     test_medicine_id: MedicineInfo("Vitamin B", "portion", Regularity.ONCE_A_WEEK, date(2022, 3, 8),
@@ -26,11 +28,12 @@ user_to_medicine_ids: Dict[str, List[str]] = {
 }
 
 users_list: Dict[str, UserInfo] = {test_user_id: UserInfo('test_user', 'test_user', '123456'),
-                                   snd_user_id: UserInfo('snd_user', 'snd_user', '123456')}
+                                   snd_user_id: UserInfo('snd_user', 'snd_user', '123456'),
+                                   test_observer_id: UserInfo('test_observer', 'test_observer', '123456')}
 username_to_uuid: Dict[str, str] = {'test_user': test_user_id,
                                     'snd_user': snd_user_id}
 users_to_dependents: Dict[str, List[str]] = {}
-users_to_observers: Dict[str, List[str]] = {}
+users_to_observers: Dict[str, List[str]] = {test_user_id: [test_observer_id]}
 users_to_incoming_request: Dict[str, List[str]] = {}
 users_to_outgoing_request: Dict[str, List[str]] = {}
 
@@ -70,6 +73,17 @@ def from_medicine_id_to_medicine_id_and_info_json(medicine_id):
     return mi_json
 
 
+def user_info_to_profile(user_info: UserInfo):
+    return Profile(name=user_info.fullname, nickname=user_info.username)
+
+
+def profiles_to_json(profile: Profile):
+    return {
+        'name': profile.name,
+        'nickname': profile.nickname,
+    }
+
+
 @app.route('/add_medicine', methods=['POST'])
 def add_medicine():
     content_type = request.headers.get('Content-Type')
@@ -87,7 +101,8 @@ def add_medicine():
             user_to_medicine_ids[user_id].append(medicine_id)
         else:
             user_to_medicine_ids[user_id] = [medicine_id]
-        for take_date in medicine_info.regularity.take_dates_generator(medicine_info.start_date, medicine_info.end_date):
+        for take_date in medicine_info.regularity.take_dates_generator(medicine_info.start_date,
+                                                                       medicine_info.end_date):
             if take_date not in date_to_medicine_status:
                 date_to_medicine_status[take_date] = {}
             if user_id not in date_to_medicine_status[take_date]:
@@ -110,7 +125,8 @@ def delete_medicine():
         if medicine_id not in user_to_medicine_ids.get(user_id, []):
             return f"Medicine with id {medicine_id} wasn't found"
         medicine_info = medicine_id_to_medicine_info[medicine_id]
-        for take_date in medicine_info.regularity.take_dates_generator(medicine_info.start_date, medicine_info.end_date):
+        for take_date in medicine_info.regularity.take_dates_generator(medicine_info.start_date,
+                                                                       medicine_info.end_date):
             if take_date not in date_to_medicine_status:
                 raise KeyError()
             if user_id not in date_to_medicine_status[take_date]:
@@ -377,6 +393,40 @@ def observer_remove():
         return f'User {observer_username} successfully removed', 200
     else:
         return 'Content-Type not supported!', 404
+
+
+def check_user_id_exists(user_id):
+    if user_id not in users_to_dependents:
+        users_to_dependents[user_id] = []
+    if user_id not in users_to_observers:
+        users_to_observers[user_id] = []
+    if user_id not in users_to_incoming_request:
+        users_to_incoming_request[user_id] = []
+    if user_id not in users_to_outgoing_request:
+        users_to_outgoing_request[user_id] = []
+
+
+@app.route('/explore', methods=['GET'])
+def get_explore():
+    user_id = request.args.get('user_id')
+    if user_id is None:
+        return 'User id must be provided', 400
+    if user_id not in users_list:
+        return f'User with id {user_id} not found', 404
+    check_user_id_exists(user_id)
+
+    result = [
+        ('Dependents', users_to_dependents[user_id]),
+        ('Observers', users_to_observers[user_id]),
+        ('Incoming requests', users_to_incoming_request[user_id]),
+        ('Outgoing requests', users_to_outgoing_request[user_id]),
+    ]
+    return flask.jsonify(
+        [{'profiles': [profiles_to_json(user_info_to_profile(users_list[profile])) for profile in profiles],
+          'list_name': list_name
+          }
+         for list_name, profiles in result]
+    ), 200
 
 
 if __name__ == '__main__':
