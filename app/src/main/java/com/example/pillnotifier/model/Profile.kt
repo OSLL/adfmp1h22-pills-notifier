@@ -7,4 +7,4 @@ class Profile(name: String, nickname: String) {
         private set
 }
 
-class ProfilesList(val listName: String, val profiles: List<Profile>)
+class ProfilesList(val list_name: String, val profiles: List<Profile>)

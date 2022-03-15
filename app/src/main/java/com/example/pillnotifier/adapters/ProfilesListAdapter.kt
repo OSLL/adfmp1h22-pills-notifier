@@ -28,13 +28,14 @@ class ProfilesListAdapter<ViewHolderType : AbstractProfileViewHolder>(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val profilesListWithAdapterCreator = profilesListsWithAdapterCreators[position]
 
-        holder.listNameTV.text = profilesListWithAdapterCreator.first.listName
+        holder.listNameTV.text = profilesListWithAdapterCreator.first.list_name
         holder.listSizeTV.text =
             profilesListWithAdapterCreator.first.profiles.size.toString() + " people"
 
         holder.profilesListRV.adapter = profilesListWithAdapterCreator.second(
             context,
             profilesListWithAdapterCreator.first.profiles
+
         )
         holder.profilesListRV.addItemDecoration(
             DividerItemDecoration(

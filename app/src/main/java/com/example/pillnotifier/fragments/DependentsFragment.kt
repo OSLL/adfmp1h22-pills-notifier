@@ -13,10 +13,8 @@ import com.example.pillnotifier.R
 import com.example.pillnotifier.adapters.DependentWithTakesAdapter
 import com.example.pillnotifier.model.*
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.Month
-import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
 class DependentsFragment : Fragment() {
