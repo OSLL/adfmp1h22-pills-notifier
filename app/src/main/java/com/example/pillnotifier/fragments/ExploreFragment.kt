@@ -43,6 +43,8 @@ class ExploreFragment : Fragment() {
         val error: Int? = null
     )
 
+    private lateinit var recyclerView: RecyclerView
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,7 +53,7 @@ class ExploreFragment : Fragment() {
         val exploreListLL: LinearLayout = view.findViewById(R.id.explore_list)
         val swipeRefresh: SwipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
 
-        val recyclerView: RecyclerView = view.findViewById(R.id.profiles_lists_rv)
+        recyclerView = view.findViewById(R.id.profiles_lists_rv)
         val loading = view.findViewById<ProgressBar>(R.id.loading)
         recyclerView.adapter = ProfilesListAdapter(requireContext(), profilesListWithAdaptCreators)
         recyclerView.addItemDecoration(
@@ -64,82 +66,9 @@ class ExploreFragment : Fragment() {
         loading.visibility = View.VISIBLE
         lifecycleScope.launch {
             val result: ExploreListResult = withContext(Dispatchers.IO) {
-                suspendCoroutine { cont ->
-                    val client = OkHttpClient.Builder().build()
-
-                    val httpUrl: HttpUrl? = (Constants.BASE_URL + "/explore").toHttpUrlOrNull()
-                    if (httpUrl == null) {
-                        cont.resume(ExploreListResult(error = R.string.explore_failed))
-                    }
-
-                    val httpUrlBuilder: HttpUrl.Builder = httpUrl!!.newBuilder()
-                    httpUrlBuilder.addQueryParameter("user_id", DataHolder.getData("userId"))
-
-                    val request: Request = Request.Builder()
-                        .url(httpUrlBuilder.build())
-                        .build()
-
-                    client.newCall(request).enqueue(object : Callback {
-                        override fun onFailure(call: Call, e: IOException) {
-                            cont.resume(ExploreListResult(error = R.string.explore_failed))
-                        }
-
-                        override fun onResponse(call: Call, response: Response) {
-                            val message: String = response.body!!.string()
-                            val gson = Gson()
-                            if (response.code == 200) {
-                                val expList =
-                                    gson.fromJson(message, Array<ProfilesList>::class.java)
-                                        .toMutableList()
-                                cont.resume(ExploreListResult(success = expList))
-                            } else {
-                                onFailure(call, IOException(message))
-                            }
-                        }
-                    })
-                }
+                getInfoForUpdate()
             }
-            if (result.success != null) {
-                profilesListWithAdaptCreators.addAll(
-                    listOf(
-                        Pair(result.success[0]) { c, pl ->
-                            ProfileAdapter(
-                                c,
-                                pl,
-                                R.layout.removable_user_list_item
-                            ) { v -> SimpleProfileHolder(v) }
-                        },
-
-                        Pair(result.success[1]) { c, pl ->
-                            ProfileAdapter(
-                                c,
-                                pl,
-                                R.layout.removable_user_list_item
-                            ) { v -> SimpleProfileHolder(v) }
-                        },
-
-                        Pair(result.success[2]) { c, pl ->
-                            ProfileAdapter(
-                                c,
-                                pl,
-                                R.layout.incoming_request_item
-                            ) { v -> SimpleProfileHolder(v) }
-                        },
-
-                        Pair(result.success[3]) { c, pl ->
-                            ProfileAdapter(
-                                c,
-                                pl,
-                                R.layout.outgoing_request_item
-                            ) { v -> SimpleProfileHolder(v) }
-                        },
-                    )
-                )
-                recyclerView.adapter!!.notifyDataSetChanged()
-            } else if (result.error != null) {
-                Toast.makeText(context, result.error
-                    , Toast.LENGTH_SHORT).show()
-            }
+            updateRecyclerView(result)
             loading.visibility = View.GONE
             exploreListLL.visibility = View.VISIBLE
         }
@@ -212,87 +141,93 @@ class ExploreFragment : Fragment() {
             loading.visibility = View.VISIBLE
             lifecycleScope.launch {
                 val result: ExploreListResult = withContext(Dispatchers.IO) {
-                    suspendCoroutine { cont ->
-                        val client = OkHttpClient.Builder().build()
-
-                        val httpUrl: HttpUrl? = (Constants.BASE_URL + "/explore").toHttpUrlOrNull()
-                        if (httpUrl == null) {
-                            cont.resume(ExploreListResult(error = R.string.explore_failed))
-                        }
-
-                        val httpUrlBuilder: HttpUrl.Builder = httpUrl!!.newBuilder()
-                        httpUrlBuilder.addQueryParameter("user_id", DataHolder.getData("userId"))
-
-                        val request: Request = Request.Builder()
-                            .url(httpUrlBuilder.build())
-                            .build()
-
-                        client.newCall(request).enqueue(object : Callback {
-                            override fun onFailure(call: Call, e: IOException) {
-                                cont.resume(ExploreListResult(error = R.string.explore_failed))
-                            }
-
-                            override fun onResponse(call: Call, response: Response) {
-                                val message: String = response.body!!.string()
-                                val gson = Gson()
-                                if (response.code == 200) {
-                                    val expList =
-                                        gson.fromJson(message, Array<ProfilesList>::class.java)
-                                            .toMutableList()
-                                    cont.resume(ExploreListResult(success = expList))
-                                } else {
-                                    onFailure(call, IOException(message))
-                                }
-                            }
-                        })
-                    }
+                    getInfoForUpdate()
                 }
-                if (result.success != null) {
-                    profilesListWithAdaptCreators.clear()
-                    profilesListWithAdaptCreators.addAll(
-                        listOf(
-                            Pair(result.success[0]) { c, pl ->
-                                ProfileAdapter(
-                                    c,
-                                    pl,
-                                    R.layout.removable_user_list_item
-                                ) { v -> SimpleProfileHolder(v) }
-                            },
-
-                            Pair(result.success[1]) { c, pl ->
-                                ProfileAdapter(
-                                    c,
-                                    pl,
-                                    R.layout.removable_user_list_item
-                                ) { v -> SimpleProfileHolder(v) }
-                            },
-
-                            Pair(result.success[2]) { c, pl ->
-                                ProfileAdapter(
-                                    c,
-                                    pl,
-                                    R.layout.incoming_request_item
-                                ) { v -> SimpleProfileHolder(v) }
-                            },
-
-                            Pair(result.success[3]) { c, pl ->
-                                ProfileAdapter(
-                                    c,
-                                    pl,
-                                    R.layout.outgoing_request_item
-                                ) { v -> SimpleProfileHolder(v) }
-                            },
-                        )
-                    )
-                    recyclerView.adapter!!.notifyDataSetChanged()
-                } else if (result.error != null) {
-                    Toast.makeText(context, result.error, Toast.LENGTH_SHORT).show()
-                }
+                updateRecyclerView(result)
             }
             loading.visibility = View.GONE
             swipeRefresh.isRefreshing = false
         }
         return view
+    }
+
+    private fun updateRecyclerView(result: ExploreListResult) {
+        if (result.success != null) {
+            profilesListWithAdaptCreators.clear()
+            profilesListWithAdaptCreators.addAll(
+                listOf(
+                    Pair(result.success[0]) { c, pl ->
+                        ProfileAdapter(
+                            c,
+                            pl,
+                            R.layout.removable_user_list_item
+                        ) { v -> SimpleProfileHolder(v) }
+                    },
+
+                    Pair(result.success[1]) { c, pl ->
+                        ProfileAdapter(
+                            c,
+                            pl,
+                            R.layout.removable_user_list_item
+                        ) { v -> SimpleProfileHolder(v) }
+                    },
+
+                    Pair(result.success[2]) { c, pl ->
+                        ProfileAdapter(
+                            c,
+                            pl,
+                            R.layout.incoming_request_item
+                        ) { v -> SimpleProfileHolder(v) }
+                    },
+
+                    Pair(result.success[3]) { c, pl ->
+                        ProfileAdapter(
+                            c,
+                            pl,
+                            R.layout.outgoing_request_item
+                        ) { v -> SimpleProfileHolder(v) }
+                    },
+                )
+            )
+            recyclerView.adapter!!.notifyDataSetChanged()
+        } else if (result.error != null) {
+            Toast.makeText(context, result.error, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private suspend fun getInfoForUpdate() : ExploreListResult = suspendCoroutine { cont ->
+        val client = OkHttpClient.Builder().build()
+
+        val httpUrl: HttpUrl? = (Constants.BASE_URL + "/explore").toHttpUrlOrNull()
+        if (httpUrl == null) {
+            cont.resume(ExploreListResult(error = R.string.explore_failed))
+        }
+
+        val httpUrlBuilder: HttpUrl.Builder = httpUrl!!.newBuilder()
+        httpUrlBuilder.addQueryParameter("user_id", DataHolder.getData("userId"))
+
+        val request: Request = Request.Builder()
+            .url(httpUrlBuilder.build())
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                cont.resume(ExploreListResult(error = R.string.explore_failed))
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val message: String = response.body!!.string()
+                val gson = Gson()
+                if (response.code == 200) {
+                    val expList =
+                        gson.fromJson(message, Array<ProfilesList>::class.java)
+                            .toMutableList()
+                    cont.resume(ExploreListResult(success = expList))
+                } else {
+                    onFailure(call, IOException(message))
+                }
+            }
+        })
     }
 
 }
