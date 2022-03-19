@@ -156,7 +156,6 @@ class MedicineProfile : AppCompatActivity() {
 
         val medicine: Medicine? = intent.extras?.get("medicine") as Medicine?
         if (mode != Mode.CREATE) {
-            // TODO set fields
             if (medicine == null)
                 throw RuntimeException("Medicine wasn't passed")
             medicineInput.setText(medicine.medicine_name ?: "")
@@ -173,6 +172,7 @@ class MedicineProfile : AppCompatActivity() {
                 )) {
                     view.focusable = View.NOT_FOCUSABLE
                 }
+                regularitySpinner.isEnabled = false
                 submitButton.visibility = View.GONE
                 return
             }

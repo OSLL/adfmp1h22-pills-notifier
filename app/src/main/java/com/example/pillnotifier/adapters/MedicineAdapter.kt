@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -73,6 +74,12 @@ class MedicineAdapter(
             intent.putExtra("medicine", medicine)
             activityForResultLauncher.launch(intent)
         }
+        holder.itemLL.setOnClickListener {
+            val intent = Intent(it.context, MedicineProfile::class.java)
+            intent.putExtra("mode", MedicineProfile.Mode.READ)
+            intent.putExtra("medicine", medicine)
+            it.context.startActivity(intent)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -80,6 +87,7 @@ class MedicineAdapter(
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val itemLL: LinearLayout = itemView.findViewById(R.id.medicine_item_in_medicine_list)
         val medicineName: TextView = itemView.findViewById(R.id.medicine_name)
         val portion: TextView = itemView.findViewById(R.id.medicine_portion)
         val regularityAndTakeTime: TextView = itemView.findViewById(R.id.regularity_ant_take_time)
