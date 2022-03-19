@@ -20,8 +20,8 @@ snd_user_id = str(uuid.uuid4())
 test_observer_id = str(uuid.uuid4())
 
 medicine_id_to_medicine_info: Dict[str, MedicineInfo] = {
-    test_medicine_id: MedicineInfo("Vitamin B", "portion", Regularity.ONCE_A_WEEK, date(2022, 3, 8),
-                                   date(2022, 3, 8), time(16))
+    test_medicine_id: MedicineInfo("Vitamin B", "portion", Regularity.DAILY, date(2022, 1, 1),
+                                   date(2022, 4, 1), time(16))
 }
 user_to_medicine_ids: Dict[str, List[str]] = {
     test_user_id: [test_medicine_id]
@@ -39,11 +39,10 @@ users_to_incoming_request: Dict[str, List[str]] = {}
 users_to_outgoing_request: Dict[str, List[str]] = {}
 
 # { date : {user: { medicine_id: TakeStatus } } }
-date_to_medicine_status: Dict[date, Dict[str, Dict[str, TakeStatus]]] = {
-    date(2022, 3, 8): {test_user_id: {test_medicine_id: TakeStatus.TAKEN}},
-    date(2022, 3, 10): {test_user_id: {test_medicine_id: TakeStatus.NOT_TAKEN}},
-    date(2022, 3, 11): {test_user_id: {test_medicine_id: TakeStatus.UNKNOWN}}
-}
+date_to_medicine_status: Dict[date, Dict[str, Dict[str, TakeStatus]]] = {}
+test_medicine_info = medicine_id_to_medicine_info[test_medicine_id]
+for take_date in Regularity.DAILY.take_dates_generator(test_medicine_info.start_date, test_medicine_info.end_date):
+    date_to_medicine_status[take_date] = {test_user_id: {test_medicine_id: TakeStatus.UNKNOWN}}
 
 
 def from_json_to_medicine_info(json_request):
