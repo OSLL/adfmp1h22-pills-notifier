@@ -117,7 +117,7 @@ def add_medicine():
 @app.route('/user/delete_medicine', methods=['DELETE'])
 def delete_medicine():
     content_type = request.headers.get('Content-Type')
-    if content_type == 'application/json':
+    if content_type.startswith('application/json'):
         request_json = request.json
         if 'user_id' not in request_json:
             return 'User id must be provided', 400
