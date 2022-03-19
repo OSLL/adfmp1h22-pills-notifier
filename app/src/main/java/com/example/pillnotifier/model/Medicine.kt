@@ -2,6 +2,7 @@ package com.example.pillnotifier.model
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import java.io.Serializable
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -18,14 +19,14 @@ enum class Regularity(val stringInterpretation: String) {
     ONCE_A_WEEK("Once a week")
 }
 
-class Medicine {
+class Medicine : Serializable {
     var medicine_id: String? = null
     var medicine_name: String? = null
     var portion: Portion? = null
     var time: String? = null
     var regularity: Regularity? = null
-    private var start_date: String? = null
-    private var end_date: String? = null
+    var start_date: String? = null
+    var end_date: String? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     constructor(medicine_id: String,

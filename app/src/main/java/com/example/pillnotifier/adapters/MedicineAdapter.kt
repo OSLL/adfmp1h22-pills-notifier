@@ -1,6 +1,8 @@
 package com.example.pillnotifier.adapters
 
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
 import android.view.LayoutInflater
@@ -8,15 +10,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pillnotifier.MedicineProfile
 import com.example.pillnotifier.R
+import com.example.pillnotifier.data.deleteMedicine
+import com.example.pillnotifier.model.DataHolder
 import com.example.pillnotifier.model.Medicine
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
-class MedicineAdapter(context: Context, private val medicine: List<Medicine>) : RecyclerView.Adapter<MedicineAdapter.ViewHolder>() {
+class MedicineAdapter(
+    private val context: Context,
+    private val medicines: MutableList<Medicine>,
+    private val activityForResultLauncher: ActivityResultLauncher<Intent>
+) : RecyclerView.Adapter<MedicineAdapter.ViewHolder>() {
     private val layoutInflater = LayoutInflater.from(context)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -26,23 +38,45 @@ class MedicineAdapter(context: Context, private val medicine: List<Medicine>) : 
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val medicine = medicine[position]
+        val medicine = medicines[position]
         holder.medicineName.text = medicine.medicine_name
         holder.portion.text = medicine.portion
         holder.regularityAndTakeTime.text = medicine.regularity!!.stringInterpretation +
                 " at " + medicine.time!!.format(DateTimeFormatter.ofPattern("HH:mm"))
         holder.deleteButton.setOnClickListener {
-            val intent = Intent(it.context, MedicineProfile::class.java)
-            it.context.startActivity(intent)
+            val dialogClickListener =
+                DialogInterface.OnClickListener { _, which ->
+                    when (which) {
+                        DialogInterface.BUTTON_POSITIVE -> {
+                            var errorMsg: String? = null
+                            GlobalScope.launch {
+                                errorMsg = deleteMedicine(DataHolder.getData("userId"), medicine.medicine_id!!)
+                            }
+                            if (errorMsg != null) {
+                                Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
+                            } else {
+                                medicines.removeAt(position)
+                                notifyDataSetChanged()
+                            }
+                        }
+                        DialogInterface.BUTTON_NEGATIVE -> {}
+                    }
+                }
+
+            val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+            builder.setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show()
         }
         holder.editButton.setOnClickListener {
             val intent = Intent(it.context, MedicineProfile::class.java)
-            it.context.startActivity(intent)
+            intent.putExtra("mode", MedicineProfile.Mode.EDIT)
+            intent.putExtra("medicine", medicine)
+            activityForResultLauncher.launch(intent)
         }
     }
 
     override fun getItemCount(): Int {
-        return medicine.size
+        return medicines.size
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
