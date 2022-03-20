@@ -15,8 +15,7 @@ import com.example.pillnotifier.R
 import com.example.pillnotifier.adapters.ProfileAdapter
 import com.example.pillnotifier.adapters.ProfileAdapterCreator
 import com.example.pillnotifier.adapters.ProfilesListAdapter
-import com.example.pillnotifier.adapters.holders.AbstractProfileViewHolder
-import com.example.pillnotifier.adapters.holders.SimpleProfileHolder
+import com.example.pillnotifier.adapters.holders.*
 import com.example.pillnotifier.model.DataHolder
 import com.example.pillnotifier.model.ProfilesList
 import com.google.gson.Gson
@@ -38,7 +37,7 @@ class ExploreFragment : Fragment() {
     private val profilesListWithAdaptCreators =
         mutableListOf<Pair<ProfilesList, ProfileAdapterCreator<AbstractProfileViewHolder>>>()
 
-    private class ExploreListResult(
+    class ExploreListResult(
         val success: MutableList<ProfilesList>? = null,
         val error: Int? = null
     )
@@ -123,7 +122,7 @@ class ExploreFragment : Fragment() {
                             c,
                             pl,
                             R.layout.removable_user_list_item
-                        ) { v -> SimpleProfileHolder(v) }
+                        ) { v -> RemovableProfileHolder(v, lifecycleScope, context, "/dependent/remove") }
                     },
 
                     Pair(result.success[1]) { c, pl ->
@@ -131,7 +130,7 @@ class ExploreFragment : Fragment() {
                             c,
                             pl,
                             R.layout.removable_user_list_item
-                        ) { v -> SimpleProfileHolder(v) }
+                        ) { v -> RemovableProfileHolder(v, lifecycleScope, context, "/observer/remove") }
                     },
 
                     Pair(result.success[2]) { c, pl ->
@@ -139,7 +138,7 @@ class ExploreFragment : Fragment() {
                             c,
                             pl,
                             R.layout.incoming_request_item
-                        ) { v -> SimpleProfileHolder(v) }
+                        ) { v -> IncomingProfileHolder(v, lifecycleScope, context) }
                     },
 
                     Pair(result.success[3]) { c, pl ->
@@ -147,7 +146,7 @@ class ExploreFragment : Fragment() {
                             c,
                             pl,
                             R.layout.outgoing_request_item
-                        ) { v -> SimpleProfileHolder(v) }
+                        ) { v -> OutgoingProfileHolder(v, lifecycleScope, context) }
                     },
                 )
             )
