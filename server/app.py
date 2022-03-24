@@ -14,25 +14,39 @@ from models.take_status import TakeStatus
 # create the Flask app
 app = Flask(__name__)
 
-test_medicine_id = str(uuid.uuid4())
+test_medicine_id_fst = str(uuid.uuid4())
+test_medicine_id_snd = str(uuid.uuid4())
+test_medicine_id_thd = str(uuid.uuid4())
 test_user_id = str(uuid.uuid4())
 snd_user_id = str(uuid.uuid4())
 test_observer_id = str(uuid.uuid4())
 
+test_user_for_schedule_fragment_id = "test_schedule"
+
 medicine_id_to_medicine_info: Dict[str, MedicineInfo] = {
-    test_medicine_id: MedicineInfo("Vitamin B", "portion", Regularity.DAILY, date(2022, 1, 1),
-                                   date(2022, 4, 1), time(16))
+    test_medicine_id_fst: MedicineInfo("Vitamin B", "portion", Regularity.DAILY, date(2022, 1, 1),
+                                       date(2022, 4, 1), time(16)),
+    test_medicine_id_snd: MedicineInfo("Vitamin A", "portion", Regularity.DAILY, date(2022, 1, 1),
+                                       date(2022, 4, 1), time(13)),
+    test_medicine_id_thd: MedicineInfo("Vitamin C", "portion", Regularity.DAILY, date(2022, 1, 1),
+                                       date(2022, 4, 1), time(12))
 }
 user_to_medicine_ids: Dict[str, List[str]] = {
-    test_user_id: [test_medicine_id]
+    test_user_id: [test_medicine_id_fst],
+    test_user_for_schedule_fragment_id: [test_medicine_id_fst]
 }
 
 users_list: Dict[str, UserInfo] = {test_user_id: UserInfo('test_user', 'test_user', '123456'),
                                    snd_user_id: UserInfo('snd_user', 'snd_user', '123456'),
-                                   test_observer_id: UserInfo('test_observer', 'test_observer', '123456')}
+                                   test_observer_id: UserInfo('test_observer', 'test_observer', '123456'),
+                                   test_user_for_schedule_fragment_id: UserInfo('test_schedule', 'test_schedule',
+                                                                                '123456')}
 username_to_uuid: Dict[str, str] = {'test_user': test_user_id,
                                     'snd_user': snd_user_id,
-                                    'test_observer': test_observer_id}
+                                    'test_observer': test_observer_id,
+                                    'test_user_for_schedule_fragment': test_user_for_schedule_fragment_id
+                                    }
+
 users_to_dependents: Dict[str, List[str]] = {}
 users_to_observers: Dict[str, List[str]] = {test_user_id: [test_observer_id]}
 users_to_incoming_request: Dict[str, List[str]] = {}
@@ -40,9 +54,13 @@ users_to_outgoing_request: Dict[str, List[str]] = {}
 
 # { date : {user: { medicine_id: TakeStatus } } }
 date_to_medicine_status: Dict[date, Dict[str, Dict[str, TakeStatus]]] = {}
-test_medicine_info = medicine_id_to_medicine_info[test_medicine_id]
+test_medicine_info = medicine_id_to_medicine_info[test_medicine_id_fst]
 for take_date in Regularity.DAILY.take_dates_generator(test_medicine_info.start_date, test_medicine_info.end_date):
-    date_to_medicine_status[take_date] = {test_user_id: {test_medicine_id: TakeStatus.UNKNOWN}}
+    date_to_medicine_status[take_date] = {test_user_id: {test_medicine_id_fst: TakeStatus.UNKNOWN},
+                                          test_user_for_schedule_fragment_id: {test_medicine_id_fst: TakeStatus.UNKNOWN,
+                                                                               test_medicine_id_snd: TakeStatus.TAKEN,
+                                                                               test_medicine_id_thd: TakeStatus.NOT_TAKEN}
+                                          }
 
 
 def from_json_to_medicine_info(json_request):
