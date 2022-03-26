@@ -1,9 +1,13 @@
 package com.example.pillnotifier
 
 import android.view.View
+import androidx.core.view.get
+import androidx.core.view.isVisible
 import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -12,6 +16,8 @@ import com.example.pillnotifier.fragments.ExploreFragment
 import com.example.pillnotifier.model.DataHolder
 import com.example.pillnotifier.model.Profile
 import com.example.pillnotifier.model.ProfilesList
+import kotlinx.android.synthetic.main.profiles_list.view.*
+import kotlinx.android.synthetic.main.removable_user_list_item.view.*
 import kotlinx.android.synthetic.main.user_item.view.*
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -36,13 +42,18 @@ class ExploreInstrumentedTest {
     ): Matcher<View?> {
         return object : BoundedMatcher<View?, View>(View::class.java) {
             override fun describeTo(description: Description) {
-                description.appendText("Checking medicine item properties")
+                description.appendText("Checking profile item properties")
             }
 
             override fun matchesSafely(foundView: View): Boolean {
-                return profile.profiles.all { foundView.user_name_tv.text.equals(it.name) }
-//                        && foundView.user_nickname_tv.text.equals(profile.nickname)
-//                        && foundView.remove_button.isVisible
+                for ((pos, prof) in profile.profiles.withIndex()) {
+                    if (!(foundView.profiles_lists_rv[pos].user_name_tv.text.equals(prof.name) &&
+                                foundView.profiles_lists_rv[pos].user_nickname_tv.text.equals(prof.nickname) &&
+                                foundView.profiles_lists_rv[pos].remove_button.isVisible)) {
+                        return false
+                    }
+                }
+                return true
             }
         }
 
@@ -51,11 +62,17 @@ class ExploreInstrumentedTest {
 
     data class ProfileInfo(val name: String, val nickname: String)
 
-    private fun checkMedicinesList(profiles: List<ProfilesList>) {
+    private fun checkExploreList(profiles: List<ProfilesList>) {
         onView(isRoot()).perform(waitUntilNotShown(R.id.loading, 10000))
         onView(withId(R.id.explore_rv)).check(matches(length(profiles.size)))
         for ((pos, profilesLL) in profiles.withIndex()) {
             onView(withId(R.id.explore_rv))
+                .perform(
+                    RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                        pos,
+                        clickChildViewWithId(R.id.show_meds_iv)
+                    )
+                )
                 .check(
                     matches(
                         atPosition(
@@ -70,7 +87,7 @@ class ExploreInstrumentedTest {
     @Test
     fun testDefaultListView() {
         launchFragmentInContainer<ExploreFragment>()
-        checkMedicinesList(
+        checkExploreList(
             listOf(
                 ProfilesList(
                     "Dependents",
