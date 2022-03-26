@@ -22,12 +22,11 @@ import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class RemovableProfileHolder(
+class OutgoingProfileHolder(
     itemView: View, private val lifecycleScope: LifecycleCoroutineScope,
-    private val context: Context?,
-    private val url: String
+    private val context: Context?
 ) : AbstractProfileViewHolder(itemView) {
-    private val removeButton: Button = itemView.findViewById(R.id.remove_button)
+    private val withdrawButton: Button = itemView.findViewById(R.id.withdraw_button)
     private val userNameTV: TextView
     private val userNicknameTV: TextView
 
@@ -40,7 +39,7 @@ class RemovableProfileHolder(
     override fun onBind(profile: Profile) {
         userNameTV.text = profile.name
         userNicknameTV.text = profile.nickname
-        removeButton.setOnClickListener {
+        withdrawButton.setOnClickListener {
             lifecycleScope.launch {
                 val errorMsg: String? = withContext(Dispatchers.IO) {
                     sendDependentRequest()
@@ -50,7 +49,7 @@ class RemovableProfileHolder(
                 } else {
                     Toast.makeText(
                         context,
-                        "User ${userNicknameTV.text} removed",
+                        "Request to ${userNicknameTV.text} withdrawed",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -66,7 +65,7 @@ class RemovableProfileHolder(
         val client = OkHttpClient.Builder().build()
 
         val httpUrl: HttpUrl? =
-            (Constants.BASE_URL + url).toHttpUrlOrNull()
+            (Constants.BASE_URL + "/outgoing/withdraw").toHttpUrlOrNull()
         if (httpUrl == null) {
             cont.resume("Fail to build URL for server calling")
             return@suspendCoroutine

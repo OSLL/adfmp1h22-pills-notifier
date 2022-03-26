@@ -22,12 +22,12 @@ import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class RemovableProfileHolder(
+class IncomingProfileHolder(
     itemView: View, private val lifecycleScope: LifecycleCoroutineScope,
-    private val context: Context?,
-    private val url: String
+    private val context: Context?
 ) : AbstractProfileViewHolder(itemView) {
-    private val removeButton: Button = itemView.findViewById(R.id.remove_button)
+    private val declineButton: Button = itemView.findViewById(R.id.decline_button)
+    private val acceptButton: Button = itemView.findViewById(R.id.accept_button)
     private val userNameTV: TextView
     private val userNicknameTV: TextView
 
@@ -40,17 +40,34 @@ class RemovableProfileHolder(
     override fun onBind(profile: Profile) {
         userNameTV.text = profile.name
         userNicknameTV.text = profile.nickname
-        removeButton.setOnClickListener {
+        declineButton.setOnClickListener {
             lifecycleScope.launch {
                 val errorMsg: String? = withContext(Dispatchers.IO) {
-                    sendDependentRequest()
+                    sendIncomingRequest("/incoming/decline")
                 }
                 if (errorMsg != null) {
                     Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(
                         context,
-                        "User ${userNicknameTV.text} removed",
+                        "Request from ${userNicknameTV.text} declined",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
+        acceptButton.setOnClickListener {
+            lifecycleScope.launch {
+                val errorMsg: String? = withContext(Dispatchers.IO) {
+                    sendIncomingRequest("/incoming/accept")
+                }
+                if (errorMsg != null) {
+                    Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Request from ${userNicknameTV.text} accepted",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -58,7 +75,7 @@ class RemovableProfileHolder(
         }
     }
 
-    private suspend fun sendDependentRequest() : String? = suspendCoroutine { cont ->
+    private suspend fun sendIncomingRequest(url: String) : String? = suspendCoroutine { cont ->
         if (userNicknameTV.text.toString().isEmpty()) {
             cont.resume("Username is empty")
             return@suspendCoroutine

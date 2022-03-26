@@ -14,7 +14,9 @@
 1) в папке `server` запускаем:
   
    `flask run`
-2) где-нибудь запускаем ngrok http 5000
+2) где-нибудь запускаем
+
+   `ngrok http 5000`
 3) из появившегося окна копируем ссылку вида http://c86b-178-71-107-132.ngrok.io и 
 вставляем в [сom.example.pillnotifier.Constants.BASE_URL](https://github.com/OSLL/adfmp1h22-pills-notifier/blob/server/app/src/main/java/com/example/pillnotifier/Constants.kt#L4)
 

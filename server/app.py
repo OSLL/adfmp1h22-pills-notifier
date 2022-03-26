@@ -17,12 +17,17 @@ app = Flask(__name__)
 test_medicine_id_fst = str(uuid.uuid4())
 test_medicine_id_snd = str(uuid.uuid4())
 test_medicine_id_thd = str(uuid.uuid4())
-test_user_id = str(uuid.uuid4())
+# test_user_id = str(uuid.uuid4())
+test_user_id = "test_user_id"
 snd_user_id = str(uuid.uuid4())
 test_observer_id = str(uuid.uuid4())
+sherlock_user_id = str(uuid.uuid4())
+watson_user_id = str(uuid.uuid4())
+
 
 test_user_for_schedule_fragment_id = "test_schedule"
 test_user_for_medicine_fragment_id = "test_medicine"
+test_user_for_explore_fragment_id = "test_explore"
 
 medicine_id_to_medicine_info: Dict[str, MedicineInfo] = {
     test_medicine_id_fst: MedicineInfo("Vitamin A", "1 pill", Regularity.DAILY, date(2022, 1, 1),
@@ -32,6 +37,7 @@ medicine_id_to_medicine_info: Dict[str, MedicineInfo] = {
     test_medicine_id_thd: MedicineInfo("Vitamin C", "3 pills", Regularity.DAILY, date(2022, 1, 1),
                                        date(2022, 4, 1), time(12))
 }
+
 user_to_medicine_ids: Dict[str, List[str]] = {
     test_user_id: [test_medicine_id_fst],
     test_user_for_schedule_fragment_id: [test_medicine_id_fst, test_medicine_id_snd, test_medicine_id_thd],
@@ -44,19 +50,27 @@ users_list: Dict[str, UserInfo] = {test_user_id: UserInfo('test_user', 'test_use
                                    test_user_for_schedule_fragment_id: UserInfo('test_schedule', 'test_schedule',
                                                                                 '123456'),
                                    test_user_for_medicine_fragment_id: UserInfo('test_medicine', 'test_medicine',
-                                                                                '123456')
+                                                                                '123456'),
+                                   test_user_for_explore_fragment_id: UserInfo('test_explore', 'test_explore',
+                                                                               '123456'),
+                                   sherlock_user_id: UserInfo('Sherlock Holmes', 'sherlock_holmes', '123456'),
+                                   watson_user_id: UserInfo('John Watson', 'john_watson', '123456')
                                    }
+
 username_to_uuid: Dict[str, str] = {'test_user': test_user_id,
                                     'snd_user': snd_user_id,
                                     'test_observer': test_observer_id,
                                     'test_schedule': test_user_for_schedule_fragment_id,
-                                    'test_medicine': test_user_for_medicine_fragment_id
+                                    'test_medicine': test_user_for_medicine_fragment_id,
+                                    'test_explore': test_user_for_explore_fragment_id,
+                                    'sherlock_holmes': sherlock_user_id,
+                                    'john_watson': watson_user_id
                                     }
 
-users_to_dependents: Dict[str, List[str]] = {}
-users_to_observers: Dict[str, List[str]] = {test_user_id: [test_observer_id]}
-users_to_incoming_request: Dict[str, List[str]] = {}
-users_to_outgoing_request: Dict[str, List[str]] = {}
+users_to_dependents: Dict[str, List[str]] = {test_user_id: [snd_user_id, test_observer_id]}
+users_to_observers: Dict[str, List[str]] = {snd_user_id: [test_user_id], test_observer_id: [test_user_id]}
+users_to_incoming_request: Dict[str, List[str]] = {test_user_id: [sherlock_user_id], watson_user_id: [test_user_id]}
+users_to_outgoing_request: Dict[str, List[str]] = {sherlock_user_id: [test_user_id], test_user_id: [watson_user_id]}
 
 # { date : {user: { medicine_id: TakeStatus } } }
 date_to_medicine_status: Dict[date, Dict[str, Dict[str, TakeStatus]]] = {}
@@ -330,14 +344,16 @@ def accept_observer_request():
     if content_type.startswith('application/json'):
         json_request = request.json
         user_id = json_request['user_id']
-        observer_username = json_request['observer_username']
+        observer_username = json_request['username']
         if observer_username not in username_to_uuid:
             return f'Could not find user {observer_username}', 404
         observer_id = username_to_uuid[observer_username]
         if observer_id not in users_list:
             return f'Could not find user {observer_username}', 404
-        if observer_id not in users_to_incoming_request:
+        if observer_id not in users_to_incoming_request[user_id]:
             return f'User {observer_username} declined his request', 200
+        check_user_id_exists(observer_id)
+        check_user_id_exists(user_id)
         users_to_incoming_request[user_id].remove(observer_id)
         users_to_observers[user_id].append(observer_id)
         users_to_outgoing_request[observer_id].remove(user_id)
@@ -354,7 +370,7 @@ def decline_observer_request():
     if content_type.startswith('application/json'):
         json_request = request.json
         user_id = json_request['user_id']
-        observer_username = json_request['observer_username']
+        observer_username = json_request['username']
         if observer_username not in username_to_uuid:
             return f'Could not find user {observer_username}', 404
         observer_id = username_to_uuid[observer_username]
@@ -376,7 +392,7 @@ def withdraw_outgoing_request():
     if content_type.startswith('application/json'):
         json_request = request.json
         user_id = json_request['user_id']
-        dependent_username = json_request['dependent_username']
+        dependent_username = json_request['username']
         if dependent_username not in username_to_uuid:
             return f'Could not find user {dependent_username}', 404
         dependent_id = username_to_uuid[dependent_username]
@@ -398,7 +414,7 @@ def dependent_remove():
     if content_type.startswith('application/json'):
         json_request = request.json
         user_id = json_request['user_id']
-        dependent_username = json_request['dependent_username']
+        dependent_username = json_request['username']
         if dependent_username not in username_to_uuid:
             return f'Could not find user {dependent_username}', 404
         dependent_id = username_to_uuid[dependent_username]
@@ -420,7 +436,7 @@ def observer_remove():
     if content_type.startswith('application/json'):
         json_request = request.json
         user_id = json_request['user_id']
-        observer_username = json_request['observer_username']
+        observer_username = json_request['username']
         if observer_username not in username_to_uuid:
             return f'Could not find user {observer_username}', 404
         observer_id = username_to_uuid[observer_username]
