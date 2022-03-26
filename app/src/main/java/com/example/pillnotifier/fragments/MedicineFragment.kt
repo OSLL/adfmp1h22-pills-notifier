@@ -22,7 +22,6 @@ import com.example.pillnotifier.R
 import com.example.pillnotifier.adapters.MedicineAdapter
 import com.example.pillnotifier.model.*
 import com.google.gson.Gson
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,8 +47,11 @@ class MedicineFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var medicineListLL: LinearLayout
     private lateinit var loadingProgressBar: ProgressBar
+    private lateinit var addButton: Button
 
     private suspend fun updateMedicineList() {
+        addButton.visibility = View.GONE
+        medicineListLL.visibility = View.GONE
         loadingProgressBar.visibility = View.VISIBLE
         val result: MedicineListResult = withContext(Dispatchers.IO) {
             suspendCoroutine { cont ->
@@ -95,6 +97,7 @@ class MedicineFragment : Fragment() {
             showMedicinesRequestFailed(result.error)
         }
         loadingProgressBar.visibility = View.GONE
+        addButton.visibility = View.VISIBLE
         medicineListLL.visibility = View.VISIBLE
     }
 
@@ -112,7 +115,6 @@ class MedicineFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_medicine, container, false)
         medicineListLL = view.findViewById(R.id.medicine_list)
-        medicineListLL.visibility = View.GONE
 
         recyclerView = view.findViewById(R.id.rv_medicine)
         recyclerView.adapter = MedicineAdapter(requireContext(), medicinesList, activityForResultLauncher)
@@ -124,11 +126,7 @@ class MedicineFragment : Fragment() {
 
         loadingProgressBar = view.findViewById(R.id.loading)
 
-        lifecycleScope.launch {
-            updateMedicineList()
-        }
-
-        val addButton: Button = view.findViewById(R.id.add_button)
+        addButton = view.findViewById(R.id.add_button)
         addButton.setOnClickListener{
             val intent = Intent(it.context, MedicineProfile::class.java)
             intent.putExtra("mode", MedicineProfile.Mode.CREATE)
@@ -137,10 +135,15 @@ class MedicineFragment : Fragment() {
 
         val swipeRefresh: SwipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
         swipeRefresh.setOnRefreshListener {
+            swipeRefresh.isRefreshing = false
             lifecycleScope.launch {
                 updateMedicineList()
                 swipeRefresh.isRefreshing = false
             }
+        }
+
+        lifecycleScope.launch {
+            updateMedicineList()
         }
 
         return view

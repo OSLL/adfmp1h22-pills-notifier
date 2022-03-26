@@ -42,7 +42,7 @@
             app:layout_constraintTop_toTopOf="@+id/take_time_tv" />
 
         <TextView
-            android:id="@+id/regularity_ant_take_time"
+            android:id="@+id/regularity_and_take_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/regularity"

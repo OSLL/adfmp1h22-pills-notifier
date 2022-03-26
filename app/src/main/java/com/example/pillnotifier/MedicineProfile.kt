@@ -9,7 +9,6 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.pillnotifier.adapters.MedicineAdapter
 import com.example.pillnotifier.data.deleteMedicine
 import com.example.pillnotifier.fragments.DatePickerFragment
 import com.example.pillnotifier.fragments.TimePickerFragment
@@ -107,6 +106,76 @@ class MedicineProfile : AppCompatActivity() {
         }
     }
 
+    private suspend fun editMedicine(medicineId: String) {
+        val errorMsg: String? = withContext(Dispatchers.IO) {
+            suspendCoroutine { cont ->
+                if (medicineInput.text.toString().isEmpty()) {
+                    cont.resume("Medicine name is empty")
+                    return@suspendCoroutine
+                }
+                if (!startDate.text.toString()[0].isDigit()) {
+                    cont.resume("Start date isn't selected")
+                    return@suspendCoroutine
+                }
+                if (!endDate.text.toString()[0].isDigit()) {
+                    cont.resume("End date isn't selected")
+                    return@suspendCoroutine
+                }
+                if (!takeTime.text.toString()[0].isDigit()) {
+                    cont.resume("Take time isn't selected")
+                    return@suspendCoroutine
+                }
+
+                val client = OkHttpClient.Builder().build()
+
+                val httpUrl: HttpUrl? = (Constants.BASE_URL + "/edit_medicine").toHttpUrlOrNull()
+                if (httpUrl == null) {
+                    cont.resume("Fail to build URL for server calling")
+                    return@suspendCoroutine
+                }
+                val httpUrlBuilder: HttpUrl.Builder = httpUrl.newBuilder()
+
+                val jsonObject = JSONObject();
+                jsonObject.put("medicine_id", medicineId)
+                jsonObject.put("medicine_name", medicineInput.text.toString())
+                jsonObject.put("portion", portionInput.text.toString())
+                jsonObject.put("regularity", regularitySpinner.selectedItem.toString())
+                jsonObject.put("start_date", startDate.text.toString())
+                jsonObject.put("end_date", endDate.text.toString())
+                jsonObject.put("time", takeTime.text.toString())
+
+                val mediaType = "application/json; charset=utf-8".toMediaType()
+                val body = jsonObject.toString().toRequestBody(mediaType)
+
+                val request: Request = Request.Builder()
+                    .url(httpUrlBuilder.build())
+                    .put(body)
+                    .build()
+
+                client.newCall(request).enqueue(object : Callback {
+                    override fun onFailure(call: Call, e: IOException) {
+                        cont.resume(e.message)
+                    }
+
+                    override fun onResponse(call: Call, response: Response) {
+                        val message: String = response.body!!.string()
+                        if (response.code != 200)
+                            onFailure(call, IOException(message))
+                        else
+                            cont.resume(null)
+                    }
+                })
+            }
+        }
+
+        if (errorMsg == null) {
+            setResult(RESULT_OK)
+            onBackPressed()
+        } else {
+            Toast.makeText(this@MedicineProfile, errorMsg, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private lateinit var medicineInput: EditText
     private lateinit var portionInput: EditText
     private lateinit var regularitySpinner: Spinner
@@ -122,13 +191,13 @@ class MedicineProfile : AppCompatActivity() {
 
         medicineInput = findViewById<View>(R.id.input_medicine_name) as EditText
         portionInput = findViewById<View>(R.id.input_medicine_portion) as EditText
-        regularitySpinner = findViewById<View>(R.id.spinner1) as Spinner
+        regularitySpinner = findViewById<View>(R.id.regularity_spinner) as Spinner
         startDate = findViewById<TextView>(R.id.tvStartDate)
         endDate = findViewById<TextView>(R.id.tvEndDate)
         takeTime = findViewById<TextView>(R.id.tvTakeTime)
         loading = findViewById<ProgressBar>(R.id.loading)
 
-        val submitButton = findViewById<View>(R.id.submitButton2) as Button
+        val submitButton = findViewById<View>(R.id.submitMedicineButton) as Button
 
         val mode: Mode = intent.extras?.get("mode") as Mode? ?: Mode.READ
         val myAdapter = ArrayAdapter(
@@ -193,17 +262,11 @@ class MedicineProfile : AppCompatActivity() {
                             throw RuntimeException("Medicine wasn't passed")
                         if (medicine.medicine_id == null)
                             throw RuntimeException("Medicine doesn't contains id")
-                        loading.visibility = View.VISIBLE
-                        var errorMsg: String? = null
-                        errorMsg = deleteMedicine(DataHolder.getData("userId"), medicine.medicine_id!!)
-                        if (errorMsg != null) {
-                            Toast.makeText(this@MedicineProfile, errorMsg, Toast.LENGTH_SHORT)
-                                .show()
-                        }
                         else {
-                            addMedicine()
+                            loading.visibility = View.VISIBLE
+                            editMedicine(medicine.medicine_id!!)
+                            loading.visibility = View.GONE
                         }
-                        loading.visibility = View.GONE
                     }
                 }
                 Mode.READ -> throw IllegalAccessException("Submit button can't be visible if $mode mode")

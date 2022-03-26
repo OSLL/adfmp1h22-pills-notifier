@@ -22,29 +22,35 @@ snd_user_id = str(uuid.uuid4())
 test_observer_id = str(uuid.uuid4())
 
 test_user_for_schedule_fragment_id = "test_schedule"
+test_user_for_medicine_fragment_id = "test_medicine"
 
 medicine_id_to_medicine_info: Dict[str, MedicineInfo] = {
-    test_medicine_id_fst: MedicineInfo("Vitamin B", "portion", Regularity.DAILY, date(2022, 1, 1),
+    test_medicine_id_fst: MedicineInfo("Vitamin A", "1 pill", Regularity.DAILY, date(2022, 1, 1),
                                        date(2022, 4, 1), time(16)),
-    test_medicine_id_snd: MedicineInfo("Vitamin A", "portion", Regularity.DAILY, date(2022, 1, 1),
+    test_medicine_id_snd: MedicineInfo("Vitamin B", "2 pills", Regularity.DAILY, date(2022, 1, 1),
                                        date(2022, 4, 1), time(13)),
-    test_medicine_id_thd: MedicineInfo("Vitamin C", "portion", Regularity.DAILY, date(2022, 1, 1),
+    test_medicine_id_thd: MedicineInfo("Vitamin C", "3 pills", Regularity.DAILY, date(2022, 1, 1),
                                        date(2022, 4, 1), time(12))
 }
 user_to_medicine_ids: Dict[str, List[str]] = {
     test_user_id: [test_medicine_id_fst],
-    test_user_for_schedule_fragment_id: [test_medicine_id_fst]
+    test_user_for_schedule_fragment_id: [test_medicine_id_fst, test_medicine_id_snd, test_medicine_id_thd],
+    test_user_for_medicine_fragment_id: [test_medicine_id_fst, test_medicine_id_snd]
 }
 
 users_list: Dict[str, UserInfo] = {test_user_id: UserInfo('test_user', 'test_user', '123456'),
                                    snd_user_id: UserInfo('snd_user', 'snd_user', '123456'),
                                    test_observer_id: UserInfo('test_observer', 'test_observer', '123456'),
                                    test_user_for_schedule_fragment_id: UserInfo('test_schedule', 'test_schedule',
-                                                                                '123456')}
+                                                                                '123456'),
+                                   test_user_for_medicine_fragment_id: UserInfo('test_medicine', 'test_medicine',
+                                                                                '123456')
+                                   }
 username_to_uuid: Dict[str, str] = {'test_user': test_user_id,
                                     'snd_user': snd_user_id,
                                     'test_observer': test_observer_id,
-                                    'test_user_for_schedule_fragment': test_user_for_schedule_fragment_id
+                                    'test_schedule': test_user_for_schedule_fragment_id,
+                                    'test_medicine': test_user_for_medicine_fragment_id
                                     }
 
 users_to_dependents: Dict[str, List[str]] = {}
@@ -59,7 +65,9 @@ for take_date in Regularity.DAILY.take_dates_generator(test_medicine_info.start_
     date_to_medicine_status[take_date] = {test_user_id: {test_medicine_id_fst: TakeStatus.UNKNOWN},
                                           test_user_for_schedule_fragment_id: {test_medicine_id_fst: TakeStatus.UNKNOWN,
                                                                                test_medicine_id_snd: TakeStatus.TAKEN,
-                                                                               test_medicine_id_thd: TakeStatus.NOT_TAKEN}
+                                                                               test_medicine_id_thd: TakeStatus.NOT_TAKEN},
+                                          test_user_for_medicine_fragment_id: {test_medicine_id_fst: TakeStatus.UNKNOWN,
+                                                                               test_medicine_id_snd: TakeStatus.UNKNOWN}
                                           }
 
 
@@ -152,6 +160,18 @@ def delete_medicine():
             date_to_medicine_status[take_date][user_id].pop(medicine_id)
         user_to_medicine_ids[user_id].remove(medicine_id)
         medicine_id_to_medicine_info.pop(medicine_id)
+        return 'OK', 200
+    else:
+        return 'Content-Type not supported!', 404
+
+
+@app.route('/edit_medicine', methods=['PUT'])
+def edit_medicine():
+    content_type = request.headers.get('Content-Type')
+    if content_type.startswith('application/json'):
+        request_json = request.json
+        medicine_id = request_json['medicine_id']
+        medicine_id_to_medicine_info[medicine_id] = from_json_to_medicine_info(request_json)
         return 'OK', 200
     else:
         return 'Content-Type not supported!', 404

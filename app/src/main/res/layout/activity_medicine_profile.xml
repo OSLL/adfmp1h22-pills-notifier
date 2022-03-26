@@ -31,7 +31,7 @@
             android:inputType="textPersonName" />
 
         <Spinner
-            android:id="@+id/spinner1"
+            android:id="@+id/regularity_spinner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -60,7 +60,7 @@
             android:textSize="20sp" />
 
         <Button
-            android:id="@+id/submitButton2"
+            android:id="@+id/submitMedicineButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Submit" />
