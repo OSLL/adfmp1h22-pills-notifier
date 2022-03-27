@@ -69,8 +69,8 @@ username_to_uuid: Dict[str, str] = {'test_user': test_user_id,
 
 users_to_dependents: Dict[str, List[str]] = {test_user_id: [snd_user_id, test_observer_id]}
 users_to_observers: Dict[str, List[str]] = {snd_user_id: [test_user_id], test_observer_id: [test_user_id]}
-users_to_incoming_request: Dict[str, List[str]] = {test_user_id: [sherlock_user_id], watson_user_id: [test_user_id]}
-users_to_outgoing_request: Dict[str, List[str]] = {sherlock_user_id: [test_user_id], test_user_id: [watson_user_id]}
+users_to_incoming_request: Dict[str, List[str]] = {test_user_id: [sherlock_user_id]}
+users_to_outgoing_request: Dict[str, List[str]] = {sherlock_user_id: [test_user_id]}
 
 # { date : {user: { medicine_id: TakeStatus } } }
 date_to_medicine_status: Dict[date, Dict[str, Dict[str, TakeStatus]]] = {}
