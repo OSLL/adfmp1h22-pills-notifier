@@ -1,6 +1,18 @@
 # adfmp1h22-pills-notifier
 
-## Запуск сервера:
+## Запуск сервера с помощью Docker
+Выполняем команду
+```
+docker build -t pill-reminder-server -f server.Dockerfile .
+```
+для создания образа. Далее запускаем контейнер с помощью
+```
+docker run -it pill-reminder-server
+```
+Из появившегося окна копируем ссылку вида https://c86b-178-71-107-132.ngrok.io и 
+вставляем в [сom.example.pillnotifier.Constants.BASE_URL](https://github.com/OSLL/adfmp1h22-pills-notifier/blob/server/app/src/main/java/com/example/pillnotifier/Constants.kt#L4)
+
+## Запуск сервера вручную:
 При первом использовании:
 1) Устанавливаем [flask](https://flask.palletsprojects.com/en/2.0.x/) и
    [ngrok](https://ngrok.com/download):
