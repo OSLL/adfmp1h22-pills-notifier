@@ -27,7 +27,8 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Name (Sherlock Holmes)"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:singleLine="true"/>
 
         <EditText
             android:id="@+id/link_edit"
@@ -35,7 +36,8 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Link (@greatest_detective)"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:singleLine="true"/>
 
         <Button
             android:id="@+id/submitButton"

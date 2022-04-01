@@ -86,23 +86,12 @@ class RegisterActivity : AppCompatActivity() {
                     password.text.toString()
                 )
             }
+        }
 
-            setOnEditorActionListener { _, actionId, _ ->
-                when (actionId) {
-                    EditorInfo.IME_ACTION_DONE ->
-                        loginViewModel.login(
-                            username.text.toString(),
-                            password.text.toString()
-                        )
-                }
-                false
-            }
-
-            register.setOnClickListener {
-                loading.visibility = View.VISIBLE
-                val intent = Intent(this@RegisterActivity, MainActivity::class.java)
-                startActivity(intent)
-            }
+        register.setOnClickListener {
+            loading.visibility = View.VISIBLE
+            val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+            startActivity(intent)
         }
     }
 

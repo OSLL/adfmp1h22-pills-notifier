@@ -1,10 +1,13 @@
 package com.example.pillnotifier.fragments
 
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
@@ -19,6 +22,7 @@ import com.example.pillnotifier.adapters.holders.RemovableProfileHolder
 import com.example.pillnotifier.adapters.holders.SimpleProfileHolder
 import com.example.pillnotifier.model.Profile
 import com.example.pillnotifier.model.ProfilesList
+import kotlinx.android.synthetic.main.fragment_explore.*
 
 class ExploreFragment : Fragment() {
     // TODO in the future change SimpleProfileHolder to other implementations of AbstractProfileViewHolder
@@ -61,6 +65,17 @@ class ExploreFragment : Fragment() {
         )
 
         val dependentInput: EditText = view.findViewById(R.id.dependent_input)
+        dependentInput.setOnEditorActionListener{v, actionId, event ->
+            when (actionId) {
+                EditorInfo.IME_ACTION_SEND -> {
+                    val imm: InputMethodManager = requireContext()
+                        .getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                    search_iv.performClick()
+                }
+            }
+            false
+        }
         val searchIV: ImageView = view.findViewById(R.id.search_iv)
         searchIV.setOnClickListener{ v ->
             Toast.makeText(context, "Not found user @${dependentInput.text}", Toast.LENGTH_LONG).show()

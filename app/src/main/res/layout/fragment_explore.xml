@@ -25,7 +25,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="85"
-                android:hint="Add dependent" />
+                android:hint="Add dependent"
+                android:singleLine="true"
+                android:imeOptions="actionSend"/>
             <ImageView
                 android:id="@+id/search_iv"
                 android:layout_width="0dp"
