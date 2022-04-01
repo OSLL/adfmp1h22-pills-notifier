@@ -32,6 +32,6 @@ docker run -it pill-reminder-server
 3) из появившегося окна копируем ссылку вида http://c86b-178-71-107-132.ngrok.io и 
 вставляем в [сom.example.pillnotifier.Constants.BASE_URL](https://github.com/OSLL/adfmp1h22-pills-notifier/blob/server/app/src/main/java/com/example/pillnotifier/Constants.kt#L4)
 
-### Тестовый аккаунт
+## Тестовый аккаунт
 login: `test_user`,
 password: `123456`
