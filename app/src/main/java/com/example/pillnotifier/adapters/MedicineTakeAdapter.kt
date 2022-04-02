@@ -13,6 +13,7 @@ import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pillnotifier.Constants
 import com.example.pillnotifier.R
+import com.example.pillnotifier.data.Result
 import com.example.pillnotifier.model.*
 import kotlinx.coroutines.*
 import okhttp3.*
@@ -20,6 +21,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
+import java.lang.IllegalArgumentException
 import java.time.format.DateTimeFormatter
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -99,7 +101,7 @@ class MedicineTakeAdapter(
         }
     }
 
-    private fun showStatusUpdateFailed(@StringRes errorString: Int) {
+    private fun showStatusUpdateFailed(errorString: String) {
         Toast.makeText(context, errorString, Toast.LENGTH_SHORT).show()
     }
 
@@ -117,15 +119,21 @@ class MedicineTakeAdapter(
                     val body = jsonObject.toString().toRequestBody(mediaType)
                     val client = OkHttpClient.Builder().build()
 
-                    val request: Request = Request.Builder()
+                    lateinit var request: Request
+                    try {
+                        request = Request.Builder()
                         .url(Constants.BASE_URL + "/medicine/status")
                         .addHeader("Content-Type", "application/json")
                         .post(body)
                         .build()
+                    } catch (e: IllegalArgumentException) {
+                        cont.resume(RequestResult(error = e.message))
+                        return@suspendCoroutine
+                    }
 
                     client.newCall(request).enqueue(object : Callback {
                         override fun onFailure(call: Call, e: IOException) {
-                            cont.resume(RequestResult(error = R.string.status_update_failed))
+                            cont.resume(RequestResult(error = context.resources.getString(R.string.status_update_failed)))
                         }
 
                         override fun onResponse(call: Call, response: Response) {

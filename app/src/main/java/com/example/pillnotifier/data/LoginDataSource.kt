@@ -8,6 +8,7 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
+import java.lang.IllegalArgumentException
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -25,11 +26,18 @@ class LoginDataSource {
 
             val body: RequestBody = userJson.toRequestBody("application/json".toMediaTypeOrNull())
 
-            val request: Request = Request.Builder()
-                .url(Constants.BASE_URL + "/user/login")
-                .addHeader("Content-Type", "application/json")
-                .post(body)
-                .build()
+            lateinit var request: Request
+            try {
+                request = Request.Builder()
+                    .url(Constants.BASE_URL + "/user/login")
+                    .addHeader("Content-Type", "application/json")
+                    .post(body)
+                    .build()
+            } catch (e: IllegalArgumentException) {
+                cont.resume(Result.Error(e))
+                return@suspendCoroutine
+            }
+
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {

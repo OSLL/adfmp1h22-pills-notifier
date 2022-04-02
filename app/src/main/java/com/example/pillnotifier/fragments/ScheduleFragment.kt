@@ -27,6 +27,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.io.IOException
+import java.lang.IllegalArgumentException
 import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -36,7 +37,7 @@ import kotlin.coroutines.suspendCoroutine
 class ScheduleFragment : Fragment() {
     private val medicineTakeList: MutableList<MedicineTake> = mutableListOf()
 
-    private fun showScheduleRequestFailed(@StringRes errorString: Int) {
+    private fun showScheduleRequestFailed(errorString: String) {
         Toast.makeText(context, errorString, Toast.LENGTH_SHORT).show()
     }
 
@@ -63,20 +64,28 @@ class ScheduleFragment : Fragment() {
 
                         val httpUrl: HttpUrl? = (Constants.BASE_URL + "/schedule").toHttpUrlOrNull()
                         if (httpUrl == null) {
-                            cont.resume(ScheduleResult(error = R.string.schedule_failed))
+                            cont.resume(ScheduleResult(error = requireContext().resources.getString(R.string.schedule_failed)))
                         }
 
                         val httpUrlBuilder: HttpUrl.Builder = httpUrl!!.newBuilder()
                         httpUrlBuilder.addQueryParameter("user_id", DataHolder.getData("userId"))
                         httpUrlBuilder.addQueryParameter("date", date)
 
-                        val request: Request = Request.Builder()
+
+                        lateinit var request: Request
+                        try {
+                            request = Request.Builder()
                             .url(httpUrlBuilder.build())
                             .build()
+                        } catch (e: IllegalArgumentException) {
+                            cont.resume(ScheduleResult(error = e.message))
+                            return@suspendCoroutine
+                        }
+
 
                         client.newCall(request).enqueue(object : Callback {
                             override fun onFailure(call: Call, e: IOException) {
-                                cont.resume(ScheduleResult(error = R.string.schedule_failed))
+                                cont.resume(ScheduleResult(error = context!!.resources.getString( R.string.schedule_failed)))
                             }
 
                             override fun onResponse(call: Call, response: Response) {

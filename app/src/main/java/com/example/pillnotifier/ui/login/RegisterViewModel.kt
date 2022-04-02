@@ -9,6 +9,7 @@ import com.example.pillnotifier.data.Result
 
 import com.example.pillnotifier.R
 import com.example.pillnotifier.data.model.LoggedInUser
+import com.example.pillnotifier.fragments.MedicineFragment
 import com.example.pillnotifier.model.UserInfo
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -42,11 +43,17 @@ class RegisterViewModel() : ViewModel() {
 
             val body: RequestBody = userJson.toRequestBody("application/json".toMediaTypeOrNull())
 
-            val request: Request = Request.Builder()
-                .url(Constants.BASE_URL + "/user/register")
-                .addHeader("Content-Type", "application/json")
-                .post(body)
-                .build()
+            lateinit var request: Request
+            try {
+                request = Request.Builder()
+                    .url(Constants.BASE_URL + "/user/register")
+                    .addHeader("Content-Type", "application/json")
+                    .post(body)
+                    .build()
+            } catch (e: IllegalArgumentException) {
+                cont.resume(Result.Error(e))
+                return@suspendCoroutine
+            }
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {

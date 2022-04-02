@@ -35,13 +35,13 @@ import kotlin.coroutines.suspendCoroutine
 class MedicineFragment : Fragment() {
     private val medicinesList: MutableList<Medicine> = mutableListOf()
 
-    private fun showMedicinesRequestFailed(@StringRes errorString: Int) {
+    private fun showMedicinesRequestFailed(errorString: String) {
         Toast.makeText(context, errorString, Toast.LENGTH_SHORT).show()
     }
 
     private class MedicineListResult(
         val success: MutableList<Medicine>? = null,
-        val error: Int? = null
+        val error: String? = null
     )
 
     private lateinit var recyclerView: RecyclerView
@@ -59,19 +59,25 @@ class MedicineFragment : Fragment() {
 
                 val httpUrl: HttpUrl? = (Constants.BASE_URL + "/medicines").toHttpUrlOrNull()
                 if (httpUrl == null) {
-                    cont.resume(MedicineListResult(error = R.string.medicines_failed))
+                    cont.resume(MedicineListResult(error = requireContext().resources.getString(R.string.medicines_failed)))
                 }
 
                 val httpUrlBuilder: HttpUrl.Builder = httpUrl!!.newBuilder()
                 httpUrlBuilder.addQueryParameter("user_id", DataHolder.getData("userId"))
 
-                val request: Request = Request.Builder()
-                    .url(httpUrlBuilder.build())
-                    .build()
+                lateinit var request: Request
+                try {
+                    request = Request.Builder()
+                        .url(httpUrlBuilder.build())
+                        .build()
+                } catch (e: IllegalArgumentException) {
+                    cont.resume(MedicineListResult(error = e.message))
+                    return@suspendCoroutine
+                }
 
                 client.newCall(request).enqueue(object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
-                        cont.resume(MedicineListResult(error = R.string.medicines_failed))
+                        cont.resume(MedicineListResult(error = context!!.resources.getString(R.string.medicines_failed)))
                     }
 
                     override fun onResponse(call: Call, response: Response) {

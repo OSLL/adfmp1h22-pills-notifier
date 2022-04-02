@@ -24,6 +24,8 @@ import com.example.pillnotifier.adapters.ProfilesListAdapter
 import com.example.pillnotifier.adapters.holders.*
 import com.example.pillnotifier.model.DataHolder
 import com.example.pillnotifier.model.ProfilesList
+import com.example.pillnotifier.model.RequestResult
+import com.example.pillnotifier.model.ScheduleResult
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,6 +39,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.android.synthetic.main.fragment_explore.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import java.lang.IllegalArgumentException
 
 class ExploreFragment : Fragment() {
     // TODO in the future change SimpleProfileHolder to other implementations of AbstractProfileViewHolder
@@ -45,7 +48,7 @@ class ExploreFragment : Fragment() {
 
     class ExploreListResult(
         val success: MutableList<ProfilesList>? = null,
-        val error: Int? = null
+        val error: String? = null
     )
 
     private lateinit var recyclerView: RecyclerView
@@ -228,19 +231,26 @@ class ExploreFragment : Fragment() {
 
         val httpUrl: HttpUrl? = (Constants.BASE_URL + "/explore").toHttpUrlOrNull()
         if (httpUrl == null) {
-            cont.resume(ExploreListResult(error = R.string.explore_failed))
+            cont.resume(ExploreListResult(error = requireContext().resources.getString(R.string.explore_failed)))
         }
 
         val httpUrlBuilder: HttpUrl.Builder = httpUrl!!.newBuilder()
         httpUrlBuilder.addQueryParameter("user_id", DataHolder.getData("userId"))
 
-        val request: Request = Request.Builder()
+
+        lateinit var request: Request
+        try {
+            request = Request.Builder()
             .url(httpUrlBuilder.build())
             .build()
+        } catch (e: IllegalArgumentException) {
+            cont.resume(ExploreListResult(error = e.message))
+            return@suspendCoroutine
+        }
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                cont.resume(ExploreListResult(error = R.string.explore_failed))
+                cont.resume(ExploreListResult(error = context!!.resources.getString(R.string.explore_failed)))
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -280,14 +290,20 @@ class ExploreFragment : Fragment() {
         val mediaType = "application/json; charset=utf-8".toMediaType()
         val body = jsonObject.toString().toRequestBody(mediaType)
 
-        val request: Request = Request.Builder()
-            .url(httpUrlBuilder.build())
-            .post(body)
-            .build()
+        lateinit var request: Request
+        try {
+            request = Request.Builder()
+                .url(httpUrlBuilder.build())
+                .post(body)
+                .build()
+        } catch (e: IllegalArgumentException) {
+            cont.resume(e.message!!)
+            return@suspendCoroutine
+        }
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                cont.resume(e.message)
+                cont.resume(e.message!!)
             }
 
             override fun onResponse(call: Call, response: Response) {

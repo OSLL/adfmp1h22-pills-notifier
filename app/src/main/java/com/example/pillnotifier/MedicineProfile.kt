@@ -15,6 +15,7 @@ import com.example.pillnotifier.fragments.TimePickerFragment
 import com.example.pillnotifier.model.DataHolder
 import com.example.pillnotifier.model.Medicine
 import com.example.pillnotifier.model.Regularity
+import com.example.pillnotifier.model.RequestResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -24,6 +25,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
+import java.lang.IllegalArgumentException
 import java.lang.RuntimeException
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -77,14 +79,20 @@ class MedicineProfile : AppCompatActivity() {
                 val mediaType = "application/json; charset=utf-8".toMediaType()
                 val body = jsonObject.toString().toRequestBody(mediaType)
 
-                val request: Request = Request.Builder()
+                lateinit var request: Request
+                try {
+                    request = Request.Builder()
                     .url(httpUrlBuilder.build())
                     .post(body)
                     .build()
+                } catch (e: IllegalArgumentException) {
+                    cont.resume(e.message!!)
+                    return@suspendCoroutine
+                }
 
                 client.newCall(request).enqueue(object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
-                        cont.resume(e.message)
+                        cont.resume(e.message!!)
                     }
 
                     override fun onResponse(call: Call, response: Response) {
@@ -147,14 +155,20 @@ class MedicineProfile : AppCompatActivity() {
                 val mediaType = "application/json; charset=utf-8".toMediaType()
                 val body = jsonObject.toString().toRequestBody(mediaType)
 
-                val request: Request = Request.Builder()
+                lateinit var request: Request
+                try {
+                    request = Request.Builder()
                     .url(httpUrlBuilder.build())
                     .put(body)
                     .build()
+                } catch (e: IllegalArgumentException) {
+                    cont.resume(e.message!!)
+                    return@suspendCoroutine
+                }
 
                 client.newCall(request).enqueue(object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
-                        cont.resume(e.message)
+                        cont.resume(e.message!!)
                     }
 
                     override fun onResponse(call: Call, response: Response) {
