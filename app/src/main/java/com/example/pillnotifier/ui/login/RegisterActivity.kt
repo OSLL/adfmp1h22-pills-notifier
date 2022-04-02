@@ -5,6 +5,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.lifecycle.Observer
@@ -101,7 +103,18 @@ class RegisterActivity : AppCompatActivity() {
                 )
             }
 
+            setOnEditorActionListener{v, actionId, event ->
+                when (actionId) {
+                    EditorInfo.IME_ACTION_DONE -> {
+                        val imm: InputMethodManager = this@RegisterActivity
+                            .getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.hideSoftInputFromWindow(v.windowToken, 0)
+                    }
+                }
+                false
+            }
         }
+
         register.setOnClickListener {
             loading.visibility = View.VISIBLE
             registerViewModel.register(fullName.text.toString(), username.text.toString(), password.text.toString())

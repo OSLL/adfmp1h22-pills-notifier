@@ -10,11 +10,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.pillnotifier.MainActivity
 import com.example.pillnotifier.databinding.ActivityLoginBinding
+import kotlinx.android.synthetic.main.fragment_explore.*
 
 import com.example.pillnotifier.R
 import com.example.pillnotifier.model.DataHolder
@@ -96,6 +99,16 @@ class LoginActivity : AppCompatActivity() {
                     username.text.toString(),
                     password.text.toString()
                 )
+            }
+            setOnEditorActionListener{v, actionId, event ->
+                when (actionId) {
+                    EditorInfo.IME_ACTION_DONE -> {
+                        val imm: InputMethodManager = this@LoginActivity
+                            .getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.hideSoftInputFromWindow(v.windowToken, 0)
+                    }
+                }
+                false
             }
         }
         login.setOnClickListener {
