@@ -24,7 +24,8 @@ import kotlin.coroutines.suspendCoroutine
 
 class OutgoingProfileHolder(
     itemView: View, private val lifecycleScope: LifecycleCoroutineScope,
-    private val context: Context?
+    private val context: Context?,
+    private val updateFunc: () -> Unit,
 ) : AbstractProfileViewHolder(itemView) {
     private val withdrawButton: Button = itemView.findViewById(R.id.withdraw_button)
     private val userNameTV: TextView
@@ -52,6 +53,7 @@ class OutgoingProfileHolder(
                         "Request to ${userNicknameTV.text} withdrawed",
                         Toast.LENGTH_SHORT
                     ).show()
+                    updateFunc()
                 }
             }
         }

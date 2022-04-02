@@ -24,7 +24,8 @@ import kotlin.coroutines.suspendCoroutine
 
 class IncomingProfileHolder(
     itemView: View, private val lifecycleScope: LifecycleCoroutineScope,
-    private val context: Context?
+    private val context: Context?,
+    private val updateFunc: () -> Unit,
 ) : AbstractProfileViewHolder(itemView) {
     private val declineButton: Button = itemView.findViewById(R.id.decline_button)
     private val acceptButton: Button = itemView.findViewById(R.id.accept_button)
@@ -53,6 +54,7 @@ class IncomingProfileHolder(
                         "Request from ${userNicknameTV.text} declined",
                         Toast.LENGTH_SHORT
                     ).show()
+                    updateFunc()
                 }
             }
         }
@@ -70,6 +72,7 @@ class IncomingProfileHolder(
                         "Request from ${userNicknameTV.text} accepted",
                         Toast.LENGTH_SHORT
                     ).show()
+                    updateFunc()
                 }
             }
         }
