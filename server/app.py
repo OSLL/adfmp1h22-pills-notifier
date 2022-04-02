@@ -10,6 +10,7 @@ from models.medicine_info import Regularity, MedicineInfo
 from models.profile import Profile
 from models.user_info import UserInfo
 from models.take_status import TakeStatus
+from models.notification import Notification
 
 # create the Flask app
 app = Flask(__name__)
@@ -41,6 +42,10 @@ username_to_uuid: Dict[str, str] = {'test_user': test_user_id,
                                     'test_observer': test_observer_id,
                                     'sherlock_holmes': sherlock_user_id,
                                     'john_watson': watson_user_id}
+
+user_to_notifications: Dict[str, List[Notification]] = {
+    test_user_id: [Notification('Kimberly White: Vitamin A not taken', '2022-04-01 15:00')]
+}
 
 users_to_dependents: Dict[str, List[str]] = {test_user_id: [snd_user_id, test_observer_id]}
 users_to_observers: Dict[str, List[str]] = {snd_user_id: [test_user_id], test_observer_id: [test_user_id]}
@@ -169,6 +174,20 @@ def get_schedule():
     ), 200
 
 
+@app.route('/notifications', methods=['GET'])
+def get_notifications():
+    user_id = request.args.get('user_id')
+    if user_id is None:
+        return 'User id must be provided', 400
+    if user_id not in users_list:
+        return f'User with id {user_id} not found', 404
+    return flask.jsonify(
+        [{'message': notification.message,
+          'date': notification.date}
+         for notification in user_to_notifications.get(user_id, [])]
+    ), 200
+
+
 @app.route('/medicine/status', methods=['POST'])
 def add_status():
     content_type = request.headers.get('Content-Type')
@@ -188,6 +207,13 @@ def add_status():
         medicine_date = datetime.strptime(json_request['date'], '%Y-%m-%d').date()
         medicine_id = json_request['medicine_id']
         medicine_status = TakeStatus[json_request['medicine_status']]
+        observers = users_to_observers.get(user_id, [])
+        medicine_name = medicine_id_to_medicine_info[medicine_id].medicine_name
+        username = users_list.get(user_id).username
+        notification_message = username + ": " + medicine_name + " " + medicine_status.name.lower()
+        notification_date = json_request['date'] + " " + medicine_id_to_medicine_info[medicine_id].time.strftime('%H:%M')
+        for observer_id in observers:
+            user_to_notifications.get(observer_id, []).append(Notification(notification_message, notification_date))
         date_to_medicine_status[medicine_date][user_id][medicine_id] = medicine_status
         return 'OK', 200
     else:
