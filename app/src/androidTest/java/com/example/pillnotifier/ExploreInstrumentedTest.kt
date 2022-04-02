@@ -3,13 +3,13 @@ package com.example.pillnotifier
 import android.view.View
 import androidx.core.view.get
 import androidx.core.view.isVisible
+import androidx.core.view.size
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.action.ViewActions.swipeDown
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.BoundedMatcher
@@ -31,6 +31,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.lang.RuntimeException
 
 
 @RunWith(AndroidJUnit4::class)
@@ -54,6 +55,11 @@ class ExploreInstrumentedTest {
             }
 
             override fun matchesSafely(foundView: View): Boolean {
+                if (foundView.profiles_lists_rv.size != profile.profiles.size) {
+                    throw RuntimeException("I DON'T UNDERSTAND WHY ${foundView.profiles_lists_rv.size}" +
+                            " ${profile.profiles.size} ${profile.list_name}")
+                    return false
+                }
                 for ((pos, prof) in profile.profiles.withIndex()) {
                     if (!(foundView.profiles_lists_rv[pos].user_name_tv.text.equals(prof.name) &&
                                 foundView.profiles_lists_rv[pos].user_nickname_tv.text.equals(prof.nickname) &&
@@ -188,14 +194,14 @@ class ExploreInstrumentedTest {
 
         onView(withId(R.id.explore_rv)).perform(
             RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
-                3, clickChildViewWithId(R.id.withdraw_button)
+                3,
+                clickChildViewOfChildRecycleViewItem(R.id.profiles_lists_rv, 0, R.id.withdraw_button)
             )
         )
 
-        onView(withId(R.id.swipe_refresh))
-            .perform(withCustomConstraints(swipeDown(), isDisplayingAtLeast(85)))
         onView(isRoot()).perform(waitUntilNotShown(R.id.loading, 10000))
 
+        closeRecyclerView()
         profiles[3] = ProfilesList(
             "Outgoing requests",
             listOf()

@@ -11,6 +11,7 @@ import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.contrib.PickerActions
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.util.HumanReadables
@@ -126,6 +127,25 @@ fun clickChildViewWithId(resourceId: Int): ViewAction {
         override fun perform(uiController: UiController, view: View?) {
             val v: View = view!!.findViewById(resourceId)
             v.performClick()
+        }
+    }
+}
+
+fun clickChildViewOfChildRecycleViewItem(childRecycleViewId: Int,
+                                         itemPos: Int, childViewResourceId: Int): ViewAction {
+    return object : ViewAction {
+        override fun getConstraints(): Matcher<View>? {
+            return null
+        }
+
+        override fun getDescription(): String {
+            return "Click on a child view with specified id of item of recycle view specified by position"
+        }
+
+        override fun perform(uiController: UiController, view: View?) {
+            RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
+                itemPos, clickChildViewWithId(childViewResourceId)
+            ).perform(uiController, view?.findViewById(childRecycleViewId))
         }
     }
 }

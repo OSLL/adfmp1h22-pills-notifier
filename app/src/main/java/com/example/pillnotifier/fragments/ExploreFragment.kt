@@ -151,7 +151,8 @@ class ExploreFragment : Fragment() {
                                 v,
                                 lifecycleScope,
                                 context,
-                                "/dependent/remove"
+                                "/dependent/remove",
+                                loading
                             ) {
                                 loading.visibility = View.VISIBLE
                                 lifecycleScope.launch {
@@ -171,7 +172,7 @@ class ExploreFragment : Fragment() {
                             pl,
                             R.layout.removable_user_list_item
                         ) { v ->
-                            RemovableProfileHolder(v, lifecycleScope, context, "/observer/remove") {
+                            RemovableProfileHolder(v, lifecycleScope, context, "/observer/remove", loading) {
                                 loading.visibility = View.VISIBLE
                                 lifecycleScope.launch {
                                     val result: ExploreListResult = withContext(Dispatchers.IO) {
@@ -190,7 +191,7 @@ class ExploreFragment : Fragment() {
                             pl,
                             R.layout.incoming_request_item
                         ) { v ->
-                            IncomingProfileHolder(v, lifecycleScope, context) {
+                            IncomingProfileHolder(v, lifecycleScope, context, loading) {
                                 loading.visibility = View.VISIBLE
                                 lifecycleScope.launch {
                                     val result: ExploreListResult = withContext(Dispatchers.IO) {
@@ -209,7 +210,7 @@ class ExploreFragment : Fragment() {
                             pl,
                             R.layout.outgoing_request_item
                         ) { v ->
-                            OutgoingProfileHolder(v, lifecycleScope, context) {
+                            OutgoingProfileHolder(v, lifecycleScope, context, loading) {
                                 loading.visibility = View.VISIBLE
                                 lifecycleScope.launch {
                                     val result: ExploreListResult = withContext(Dispatchers.IO) {

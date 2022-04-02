@@ -3,6 +3,7 @@ package com.example.pillnotifier.adapters.holders
 import android.content.Context
 import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.LifecycleCoroutineScope
@@ -26,6 +27,7 @@ import kotlin.coroutines.suspendCoroutine
 class IncomingProfileHolder(
     itemView: View, private val lifecycleScope: LifecycleCoroutineScope,
     private val context: Context?,
+    private val loadingProgressBar: ProgressBar?,
     private val updateFunc: () -> Unit,
 ) : AbstractProfileViewHolder(itemView) {
     private val declineButton: Button = itemView.findViewById(R.id.decline_button)
@@ -43,6 +45,7 @@ class IncomingProfileHolder(
         userNameTV.text = profile.name
         userNicknameTV.text = profile.nickname
         declineButton.setOnClickListener {
+            loadingProgressBar?.visibility = View.VISIBLE
             lifecycleScope.launch {
                 val errorMsg: String? = withContext(Dispatchers.IO) {
                     sendIncomingRequest("/incoming/decline")
