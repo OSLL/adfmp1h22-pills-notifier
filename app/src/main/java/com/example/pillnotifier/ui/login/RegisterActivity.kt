@@ -8,6 +8,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -85,6 +86,17 @@ class RegisterActivity : AppCompatActivity() {
                     username.text.toString(),
                     password.text.toString()
                 )
+            }
+
+            setOnEditorActionListener{v, actionId, event ->
+                when (actionId) {
+                    EditorInfo.IME_ACTION_DONE -> {
+                        val imm: InputMethodManager = this@RegisterActivity
+                            .getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.hideSoftInputFromWindow(v.windowToken, 0)
+                    }
+                }
+                false
             }
         }
 

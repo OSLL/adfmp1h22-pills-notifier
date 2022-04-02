@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.pillnotifier.MainActivity
 import com.example.pillnotifier.R
 import com.example.pillnotifier.databinding.ActivityLoginBinding
+import kotlinx.android.synthetic.main.fragment_explore.*
 
 class LoginActivity : AppCompatActivity() {
 
@@ -89,6 +90,16 @@ class LoginActivity : AppCompatActivity() {
                     username.text.toString(),
                     password.text.toString()
                 )
+            }
+            setOnEditorActionListener{v, actionId, event ->
+                when (actionId) {
+                    EditorInfo.IME_ACTION_DONE -> {
+                        val imm: InputMethodManager = this@LoginActivity
+                            .getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                        imm.hideSoftInputFromWindow(v.windowToken, 0)
+                    }
+                }
+                false
             }
         }
         login.setOnClickListener {

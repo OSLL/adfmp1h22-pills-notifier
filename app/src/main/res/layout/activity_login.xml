@@ -81,7 +81,8 @@
                 android:inputType="textPassword"
                 android:singleLine="true"
                 tools:targetApi="jelly_bean"
-                android:autofillHints="username"/>
+                android:autofillHints="username"
+                android:imeOptions="actionDone"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <ProgressBar
