@@ -102,7 +102,10 @@ class ExploreFragment : Fragment() {
                 val errorMsg: String? = withContext(Dispatchers.IO) {
                     sendDependentRequest()
                 }
-
+                val result = withContext(Dispatchers.IO) {
+                    getInfoForUpdate()
+                }
+                updateRecyclerView(result)
                 loading.visibility = View.GONE
 
                 if (errorMsg != null) {
@@ -156,8 +159,8 @@ class ExploreFragment : Fragment() {
                                         getInfoForUpdate()
                                     }
                                     updateRecyclerView(result)
+                                    loading.visibility = View.GONE
                                 }
-                                loading.visibility = View.GONE
                             }
                         }
                     },
@@ -175,8 +178,8 @@ class ExploreFragment : Fragment() {
                                         getInfoForUpdate()
                                     }
                                     updateRecyclerView(result)
+                                    loading.visibility = View.GONE
                                 }
-                                loading.visibility = View.GONE
                             }
                         }
                     },
@@ -194,8 +197,8 @@ class ExploreFragment : Fragment() {
                                         getInfoForUpdate()
                                     }
                                     updateRecyclerView(result)
+                                    loading.visibility = View.GONE
                                 }
-                                loading.visibility = View.GONE
                             }
                         }
                     },
@@ -213,8 +216,8 @@ class ExploreFragment : Fragment() {
                                         getInfoForUpdate()
                                     }
                                     updateRecyclerView(result)
+                                    loading.visibility = View.GONE
                                 }
-                                loading.visibility = View.GONE
                             }
                         }
                     },
