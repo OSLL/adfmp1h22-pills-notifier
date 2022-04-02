@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">PillMinder</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="username">Sherlock Holmes</string>
+    <string name="link">\u0040great_detective</string>
+    <string name="notification">Kimberly White didn\'t take Vitamin A</string>
+    <string name="date">7 February at 15:40</string>
+    <string name="medicine_name">Vitamin A</string>
+    <string name="instructions">Take 2 pills</string>
+    <string name="regularity">Daily</string>
+    <string name="medicine_name_example">Vitamin A</string>
+    <string name="medicine_portion_example">4 pills</string>
+    <string name="take_time_example">08:00</string>
+    <string name="user_name_example">Kimberly White</string>
+    <string name="nickname_example">\@kwhite</string>
+    <string name="user_list_name_example">Dependents</string>
+    <string name="user_list_size_example">2 people</string>
+    <string name="remove">Remove</string>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="withdraw">Withdraw</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome!"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_fullname">Not a valid fullname</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="registration_failed">"Registration failed"</string>
+    <string name="username_login">username</string>
+    <string name="password">password</string>
+    <string name="login">Login</string>
+    <string name="or">or</string>
+    <string name="register">Register</string>
+    <string name="fullname">fullname</string>
+    <string name="sign_up">Sign up</string>
+    <string name="schedule_failed">"Failed to update schedule"</string>
+    <string name="explore_failed">"Failed to update explore"</string>
+    <string name="status_update_failed">"Failed to update medicine take status"</string>
+    <string name="medicines_failed">"Failed to update medicines list"</string>
+</resources>
