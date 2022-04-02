@@ -25,7 +25,8 @@ import kotlin.coroutines.suspendCoroutine
 class RemovableProfileHolder(
     itemView: View, private val lifecycleScope: LifecycleCoroutineScope,
     private val context: Context?,
-    private val url: String
+    private val url: String,
+    private val updateFunc: () -> Unit,
 ) : AbstractProfileViewHolder(itemView) {
     private val removeButton: Button = itemView.findViewById(R.id.remove_button)
     private val userNameTV: TextView
@@ -53,6 +54,7 @@ class RemovableProfileHolder(
                         "User ${userNicknameTV.text} removed",
                         Toast.LENGTH_SHORT
                     ).show()
+                    updateFunc()
                 }
             }
         }

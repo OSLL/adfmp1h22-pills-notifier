@@ -29,7 +29,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.*
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
@@ -37,6 +36,7 @@ import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.android.synthetic.main.fragment_explore.*
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 class ExploreFragment : Fragment() {
     // TODO in the future change SimpleProfileHolder to other implementations of AbstractProfileViewHolder
@@ -50,6 +50,7 @@ class ExploreFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var dependentInput: EditText
+    private lateinit var loading: ProgressBar
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,7 +61,7 @@ class ExploreFragment : Fragment() {
         val swipeRefresh: SwipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
 
         recyclerView = view.findViewById(R.id.explore_rv)
-        val loading = view.findViewById<ProgressBar>(R.id.loading)
+        loading = view.findViewById(R.id.loading)
         recyclerView.adapter = ProfilesListAdapter(requireContext(), profilesListWithAdaptCreators)
         recyclerView.addItemDecoration(
             DividerItemDecoration(
@@ -139,7 +140,23 @@ class ExploreFragment : Fragment() {
                             c,
                             pl,
                             R.layout.removable_user_list_item
-                        ) { v -> RemovableProfileHolder(v, lifecycleScope, context, "/dependent/remove") }
+                        ) { v ->
+                            RemovableProfileHolder(
+                                v,
+                                lifecycleScope,
+                                context,
+                                "/dependent/remove"
+                            ) {
+                                loading.visibility = View.VISIBLE
+                                lifecycleScope.launch {
+                                    val result: ExploreListResult = withContext(Dispatchers.IO) {
+                                        getInfoForUpdate()
+                                    }
+                                    updateRecyclerView(result)
+                                }
+                                loading.visibility = View.GONE
+                            }
+                        }
                     },
 
                     Pair(result.success[1]) { c, pl ->
@@ -147,7 +164,18 @@ class ExploreFragment : Fragment() {
                             c,
                             pl,
                             R.layout.removable_user_list_item
-                        ) { v -> RemovableProfileHolder(v, lifecycleScope, context, "/observer/remove") }
+                        ) { v ->
+                            RemovableProfileHolder(v, lifecycleScope, context, "/observer/remove") {
+                                loading.visibility = View.VISIBLE
+                                lifecycleScope.launch {
+                                    val result: ExploreListResult = withContext(Dispatchers.IO) {
+                                        getInfoForUpdate()
+                                    }
+                                    updateRecyclerView(result)
+                                }
+                                loading.visibility = View.GONE
+                            }
+                        }
                     },
 
                     Pair(result.success[2]) { c, pl ->
@@ -155,7 +183,18 @@ class ExploreFragment : Fragment() {
                             c,
                             pl,
                             R.layout.incoming_request_item
-                        ) { v -> IncomingProfileHolder(v, lifecycleScope, context) }
+                        ) { v ->
+                            IncomingProfileHolder(v, lifecycleScope, context) {
+                                loading.visibility = View.VISIBLE
+                                lifecycleScope.launch {
+                                    val result: ExploreListResult = withContext(Dispatchers.IO) {
+                                        getInfoForUpdate()
+                                    }
+                                    updateRecyclerView(result)
+                                }
+                                loading.visibility = View.GONE
+                            }
+                        }
                     },
 
                     Pair(result.success[3]) { c, pl ->
@@ -163,7 +202,18 @@ class ExploreFragment : Fragment() {
                             c,
                             pl,
                             R.layout.outgoing_request_item
-                        ) { v -> OutgoingProfileHolder(v, lifecycleScope, context) }
+                        ) { v ->
+                            OutgoingProfileHolder(v, lifecycleScope, context) {
+                                loading.visibility = View.VISIBLE
+                                lifecycleScope.launch {
+                                    val result: ExploreListResult = withContext(Dispatchers.IO) {
+                                        getInfoForUpdate()
+                                    }
+                                    updateRecyclerView(result)
+                                }
+                                loading.visibility = View.GONE
+                            }
+                        }
                     },
                 )
             )
