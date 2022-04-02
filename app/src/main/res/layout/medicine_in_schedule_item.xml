@@ -63,20 +63,26 @@
         app:layout_constraintBottom_toBottomOf="@id/medicine_info_ll"
         app:layout_constraintTop_toTopOf="@id/medicine_info_ll">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/taken_iv"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_weight="50"
+            android:layout_gravity="center"
+            android:layout_weight="1"
             android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:background="@null"
             android:src="@drawable/medicine_taken" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/not_taken_iv"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_weight="50"
+            android:layout_gravity="center"
+            android:layout_weight="1"
             android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:background="@null"
             android:src="@drawable/medicine_not_taken" />
     </LinearLayout>
 

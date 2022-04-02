@@ -6,7 +6,6 @@ import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -29,7 +28,7 @@ class MedicineAdapter(context: Context, private val medicine: List<Medicine>) : 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val medicine = medicine.get(position)
         holder.medicineName.text = medicine.name
-        holder.instructions.text = medicine.instruction
+        holder.portion.text = medicine.instruction
         holder.regularityAndTakeTime.text = medicine.regularity.stringInterpretation +
                 " at " + medicine.takeTime.format(DateTimeFormatter.ofPattern("HH:mm"))
         holder.deleteButton.setOnClickListener {
@@ -48,7 +47,7 @@ class MedicineAdapter(context: Context, private val medicine: List<Medicine>) : 
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val medicineName: TextView = itemView.findViewById(R.id.medicine_name)
-        val instructions: TextView = itemView.findViewById(R.id.medicine_instructions)
+        val portion: TextView = itemView.findViewById(R.id.medicine_portion)
         val regularityAndTakeTime: TextView = itemView.findViewById(R.id.regularity_ant_take_time)
         val deleteButton: ImageButton = itemView.findViewById(R.id.button_delete)
         val editButton: ImageButton = itemView.findViewById(R.id.button_edit)

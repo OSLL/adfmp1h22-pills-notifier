@@ -79,9 +79,9 @@
                 android:background="@color/light_white"
                 android:drawableEnd="@drawable/ic_password"
                 android:inputType="textPassword"
+                android:singleLine="true"
                 tools:targetApi="jelly_bean"
-                android:autofillHints="username"
-                android:singleLine="true"/>
+                android:autofillHints="username"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <ProgressBar
