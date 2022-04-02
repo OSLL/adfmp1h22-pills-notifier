@@ -58,6 +58,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/light_white"
                 android:drawableEnd="@drawable/ic_user"
+                android:singleLine="true"
                 tools:targetApi="jelly_bean" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -78,6 +79,7 @@
                 android:background="@color/light_white"
                 android:drawableEnd="@drawable/ic_password"
                 android:inputType="textPassword"
+                android:singleLine="true"
                 tools:targetApi="jelly_bean"
                 android:autofillHints="username"/>
         </com.google.android.material.textfield.TextInputLayout>

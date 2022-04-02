@@ -20,7 +20,8 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Medicine (Vitamin A)"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:singleLine="true"/>
 
         <EditText
             android:id="@+id/input_medicine_portion"
@@ -28,7 +29,8 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="Portion (2 pills)"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:singleLine="true"/>
 
         <Spinner
             android:id="@+id/spinner1"

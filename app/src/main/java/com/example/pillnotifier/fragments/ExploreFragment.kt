@@ -1,5 +1,6 @@
 package com.example.pillnotifier.fragments
 
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,11 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -30,9 +36,9 @@ import org.json.JSONObject
 import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.android.synthetic.main.fragment_explore.*
 
 class ExploreFragment : Fragment() {
-
     // TODO in the future change SimpleProfileHolder to other implementations of AbstractProfileViewHolder
     private val profilesListWithAdaptCreators =
         mutableListOf<Pair<ProfilesList, ProfileAdapterCreator<AbstractProfileViewHolder>>>()
@@ -74,6 +80,17 @@ class ExploreFragment : Fragment() {
         }
 
         dependentInput = view.findViewById(R.id.dependent_input)
+        dependentInput.setOnEditorActionListener{v, actionId, event ->
+            when (actionId) {
+                EditorInfo.IME_ACTION_SEND -> {
+                    val imm: InputMethodManager = requireContext()
+                        .getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(v.windowToken, 0)
+                    search_iv.performClick()
+                }
+            }
+            false
+        }
         val searchIV: ImageView = view.findViewById(R.id.search_iv)
         searchIV.setOnClickListener {
             loading.visibility = View.VISIBLE

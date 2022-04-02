@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.lifecycle.Observer
@@ -102,22 +101,10 @@ class RegisterActivity : AppCompatActivity() {
                 )
             }
 
-            setOnEditorActionListener { _, actionId, _ ->
-                when (actionId) {
-                    EditorInfo.IME_ACTION_DONE ->
-                        registerViewModel.register(
-                            fullName.text.toString(),
-                            username.text.toString(),
-                            password.text.toString()
-                        )
-                }
-                false
-            }
-
-            register.setOnClickListener {
-                loading.visibility = View.VISIBLE
-                registerViewModel.register(fullName.text.toString(), username.text.toString(), password.text.toString())
-            }
+        }
+        register.setOnClickListener {
+            loading.visibility = View.VISIBLE
+            registerViewModel.register(fullName.text.toString(), username.text.toString(), password.text.toString())
         }
     }
 
