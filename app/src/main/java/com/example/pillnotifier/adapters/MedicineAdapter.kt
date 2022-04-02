@@ -90,7 +90,7 @@ class MedicineAdapter(
         val itemLL: LinearLayout = itemView.findViewById(R.id.medicine_item_in_medicine_list)
         val medicineName: TextView = itemView.findViewById(R.id.medicine_name)
         val portion: TextView = itemView.findViewById(R.id.medicine_portion)
-        val regularityAndTakeTime: TextView = itemView.findViewById(R.id.regularity_ant_take_time)
+        val regularityAndTakeTime: TextView = itemView.findViewById(R.id.regularity_and_take_time)
         val deleteButton: ImageButton = itemView.findViewById(R.id.button_delete)
         val editButton: ImageButton = itemView.findViewById(R.id.button_edit)
     }

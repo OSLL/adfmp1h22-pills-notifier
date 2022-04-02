@@ -59,7 +59,7 @@ class ExploreFragment : Fragment() {
         val exploreListLL: LinearLayout = view.findViewById(R.id.explore_list)
         val swipeRefresh: SwipeRefreshLayout = view.findViewById(R.id.swipe_refresh)
 
-        recyclerView = view.findViewById(R.id.profiles_lists_rv)
+        recyclerView = view.findViewById(R.id.explore_rv)
         val loading = view.findViewById<ProgressBar>(R.id.loading)
         recyclerView.adapter = ProfilesListAdapter(requireContext(), profilesListWithAdaptCreators)
         recyclerView.addItemDecoration(
