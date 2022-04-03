@@ -64,9 +64,15 @@ class NotificationFragment : Fragment() {
                     val httpUrlBuilder: HttpUrl.Builder = httpUrl!!.newBuilder()
                     httpUrlBuilder.addQueryParameter("user_id", DataHolder.getData("userId"))
 
-                    val request: Request = Request.Builder()
-                        .url(httpUrlBuilder.build())
-                        .build()
+                    lateinit var request: Request
+                    try {
+                        request = Request.Builder()
+                            .url(httpUrlBuilder.build())
+                            .build()
+                    } catch (e: IllegalArgumentException) {
+                        cont.resume(NotificationResult(error = R.string.notifications_failed))
+                        return@suspendCoroutine
+                    }
 
                     client.newCall(request).enqueue(object : Callback {
                         override fun onFailure(call: Call, e: IOException) {
