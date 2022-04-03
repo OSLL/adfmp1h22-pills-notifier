@@ -229,7 +229,7 @@ def get_medicines():
         return f'User with id {user_id} not found', 404
     return flask.jsonify(
         [from_medicine_id_to_medicine_id_and_info_json(medicine_id)
-         for medicine_id in user_to_medicine_ids[user_id]]
+         for medicine_id in user_to_medicine_ids.get(user_id, [])]
     ), 200
 
 
