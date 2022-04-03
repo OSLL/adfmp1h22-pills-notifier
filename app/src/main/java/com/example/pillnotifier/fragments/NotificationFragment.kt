@@ -54,7 +54,6 @@ class NotificationFragment : Fragment() {
             val result: NotificationResult = withContext(Dispatchers.IO) {
                 suspendCoroutine { cont ->
                     val client = OkHttpClient.Builder().build()
-                    Log.d("MY_LOG", "Sending request")
 
                     val httpUrl: HttpUrl? = (Constants.BASE_URL + "/notifications").toHttpUrlOrNull()
                     if (httpUrl == null) {
@@ -76,20 +75,16 @@ class NotificationFragment : Fragment() {
 
                     client.newCall(request).enqueue(object : Callback {
                         override fun onFailure(call: Call, e: IOException) {
-                            Log.d("MY_LOG", "Failed")
                             cont.resume(NotificationResult(error = R.string.notifications_failed))
                         }
 
                         override fun onResponse(call: Call, response: Response) {
-                            Log.d("MY_LOG", "OK")
                             val message: String = response.body!!.string()
                             val gson = Gson()
                             if (response.code == 200) {
-                                Log.d("MY_LOG", "OK1")
                                 val notificationList = gson.fromJson(message, Array<Notification>::class.java).toMutableList()
                                 cont.resume(NotificationResult(success = notificationList))
                             } else {
-                                Log.d("MY_LOG", "Not OK")
                                 onFailure(call, IOException(message))
                             }
                         }
