@@ -28,7 +28,11 @@ medicine_id_to_medicine_info: Dict[str, MedicineInfo] = {
                                    date(2022, 4, 1), time(16))
 }
 user_to_medicine_ids: Dict[str, List[str]] = {
-    test_user_id: [test_medicine_id]
+    test_user_id: [test_medicine_id],
+    snd_user_id: [],
+    test_observer_id: [],
+    sherlock_user_id: [],
+    watson_user_id: []
 }
 
 users_list: Dict[str, UserInfo] = {test_user_id: UserInfo('test_user', 'test_user', '123456'),
@@ -43,13 +47,41 @@ username_to_uuid: Dict[str, str] = {'test_user': test_user_id,
                                     'john_watson': watson_user_id}
 
 user_to_notifications: Dict[str, List[Notification]] = {
-    test_user_id: [Notification('Kimberly White: Vitamin A not taken', '2022-04-01 15:00')]
+    test_user_id: [Notification('Kimberly White: Vitamin A not taken', '2022-04-01 15:00')],
+    snd_user_id: [],
+    test_observer_id: [],
+    sherlock_user_id: [],
+    watson_user_id: []
 }
 
-users_to_dependents: Dict[str, List[str]] = {test_user_id: [snd_user_id, test_observer_id]}
-users_to_observers: Dict[str, List[str]] = {snd_user_id: [test_user_id], test_observer_id: [test_user_id]}
-users_to_incoming_request: Dict[str, List[str]] = {test_user_id: [sherlock_user_id], watson_user_id: [test_user_id]}
-users_to_outgoing_request: Dict[str, List[str]] = {sherlock_user_id: [test_user_id], test_user_id: [watson_user_id]}
+users_to_dependents: Dict[str, List[str]] = {
+    test_user_id: [snd_user_id, test_observer_id],
+    snd_user_id: [],
+    test_observer_id: [],
+    sherlock_user_id: [],
+    watson_user_id: []
+}
+users_to_observers: Dict[str, List[str]] = {
+    snd_user_id: [test_user_id],
+    test_observer_id: [test_user_id],
+    test_user_id: [],
+    sherlock_user_id: [],
+    watson_user_id: []
+}
+users_to_incoming_request: Dict[str, List[str]] = {
+    test_user_id: [sherlock_user_id],
+    watson_user_id: [test_user_id],
+    snd_user_id: [],
+    test_observer_id: [],
+    sherlock_user_id: []
+}
+users_to_outgoing_request: Dict[str, List[str]] = {
+    sherlock_user_id: [test_user_id],
+    test_user_id: [watson_user_id],
+    snd_user_id: [],
+    test_observer_id: [],
+    watson_user_id: []
+}
 
 # { date : {user: { medicine_id: TakeStatus } } }
 date_to_medicine_status: Dict[date, Dict[str, Dict[str, TakeStatus]]] = {}
@@ -283,6 +315,11 @@ def register():
         username_to_uuid[username] = user_id
         users_to_notification_status[user_id] = False
         user_to_medicine_ids[user_id] = []
+        user_to_notifications[user_id] = []
+        users_to_incoming_request[user_id] = []
+        users_to_outgoing_request[user_id] = []
+        users_to_observers[user_id] = []
+        users_to_dependents[user_id] = []
         result = {'userId': user_id, 'fullname': full_name, 'username': username}
         return json.dumps(result), 200
     else:
