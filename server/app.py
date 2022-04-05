@@ -23,7 +23,6 @@ test_observer_id = str(uuid.uuid4())
 sherlock_user_id = str(uuid.uuid4())
 watson_user_id = str(uuid.uuid4())
 
-
 medicine_id_to_medicine_info: Dict[str, MedicineInfo] = {
     test_medicine_id: MedicineInfo("Vitamin B", "portion", Regularity.DAILY, date(2022, 1, 1),
                                    date(2022, 4, 1), time(16))
@@ -57,6 +56,14 @@ date_to_medicine_status: Dict[date, Dict[str, Dict[str, TakeStatus]]] = {}
 test_medicine_info = medicine_id_to_medicine_info[test_medicine_id]
 for take_date in Regularity.DAILY.take_dates_generator(test_medicine_info.start_date, test_medicine_info.end_date):
     date_to_medicine_status[take_date] = {test_user_id: {test_medicine_id: TakeStatus.UNKNOWN}}
+
+users_to_notification_status: Dict[str, bool] = {
+    test_user_id: False,
+    snd_user_id: False,
+    test_observer_id: False,
+    sherlock_user_id: False,
+    watson_user_id: False
+}
 
 
 def from_json_to_medicine_info(json_request):
@@ -181,11 +188,20 @@ def get_notifications():
         return 'User id must be provided', 400
     if user_id not in users_list:
         return f'User with id {user_id} not found', 404
+    users_to_notification_status[user_id] = False
     return flask.jsonify(
         [{'message': notification.message,
           'date': notification.date}
          for notification in user_to_notifications.get(user_id, [])]
     ), 200
+
+
+@app.route('/notification_status', methods=['GET'])
+def get_notification_status():
+    user_id = request.args.get('user_id')
+    if user_id is None:
+        return 'User id must be provided', 400
+    return str(users_to_notification_status[user_id]).lower(), 200
 
 
 @app.route('/medicine/status', methods=['POST'])
@@ -211,9 +227,11 @@ def add_status():
         medicine_name = medicine_id_to_medicine_info[medicine_id].medicine_name
         username = users_list.get(user_id).username
         notification_message = username + ": " + medicine_name + " " + medicine_status.name.lower()
-        notification_date = json_request['date'] + " " + medicine_id_to_medicine_info[medicine_id].time.strftime('%H:%M')
+        notification_date = json_request['date'] + " " + medicine_id_to_medicine_info[medicine_id].time.strftime(
+            '%H:%M')
         for observer_id in observers:
             user_to_notifications.get(observer_id, []).append(Notification(notification_message, notification_date))
+            users_to_notification_status[observer_id] = True
         date_to_medicine_status[medicine_date][user_id][medicine_id] = medicine_status
         return 'OK', 200
     else:
@@ -263,6 +281,8 @@ def register():
         user_id = str(uuid.uuid4())
         users_list[user_id] = UserInfo(full_name, username, password)
         username_to_uuid[username] = user_id
+        users_to_notification_status[user_id] = False
+        user_to_medicine_ids[user_id] = []
         result = {'userId': user_id, 'fullname': full_name, 'username': username}
         return json.dumps(result), 200
     else:
@@ -315,6 +335,9 @@ def dependent_send_request():
         if dependent_id not in users_to_incoming_request:
             users_to_incoming_request[dependent_id] = []
         users_to_incoming_request[dependent_id].append(user_id)
+        notification_message = users_list[user_id].username + " wants to become your observer"
+        user_to_notifications.get(dependent_id, []).append(Notification(notification_message, ""))
+        users_to_notification_status[dependent_id] = True
         return f'Request to {dependent_username} was sent', 200
     else:
         return 'Content-Type not supported!', 404
