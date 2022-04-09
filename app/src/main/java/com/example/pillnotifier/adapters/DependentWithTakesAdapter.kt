@@ -24,11 +24,11 @@ class DependentWithTakesAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val dependentWithTakes = dependentsWithTakes[position]
 
-        holder.userNameTV.text = dependentWithTakes.dependentProfile.name
-        holder.userNicknameTV.text = "@" + dependentWithTakes.dependentProfile.nickname
+        holder.userNameTV.text = dependentWithTakes.dependent_profile.name
+        holder.userNicknameTV.text = "@" + dependentWithTakes.dependent_profile.nickname
 
         holder.dependentScheduleRV.adapter =
-            MedicineTakeAdapter(context, dependentWithTakes.medicineTakes, Rights.READ)
+            MedicineTakeAdapter(context, dependentWithTakes.medicine_takes, Rights.READ)
         holder.dependentScheduleRV.addItemDecoration(
             DividerItemDecoration(
                 holder.dependentScheduleRV.context,

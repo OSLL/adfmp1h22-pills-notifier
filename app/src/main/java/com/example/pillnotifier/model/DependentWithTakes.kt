@@ -1,3 +1,3 @@
 package com.example.pillnotifier.model
 
-class DependentWithTakes(val dependentProfile: Profile, val medicineTakes: List<MedicineTake>)
+class DependentWithTakes(val dependent_profile: Profile, val medicine_takes: List<MedicineTake>)

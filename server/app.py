@@ -67,8 +67,10 @@ username_to_uuid: Dict[str, str] = {'test_user': test_user_id,
                                     'john_watson': watson_user_id
                                     }
 
-users_to_dependents: Dict[str, List[str]] = {test_user_id: [snd_user_id, test_observer_id]}
-users_to_observers: Dict[str, List[str]] = {snd_user_id: [test_user_id], test_observer_id: [test_user_id]}
+users_to_dependents: Dict[str, List[str]] = {
+    test_user_id: [snd_user_id, test_observer_id, test_user_for_schedule_fragment_id]}
+users_to_observers: Dict[str, List[str]] = {snd_user_id: [test_user_id], test_observer_id: [test_user_id],
+                                            test_user_for_schedule_fragment_id: [test_user_id]}
 users_to_incoming_request: Dict[str, List[str]] = {test_user_id: [sherlock_user_id]}
 users_to_outgoing_request: Dict[str, List[str]] = {sherlock_user_id: [test_user_id]}
 
@@ -482,6 +484,34 @@ def get_explore():
           'list_name': list_name
           }
          for list_name, profiles in result]
+    ), 200
+
+
+@app.route('/dependents', methods=['GET'])
+def get_dependents():
+    user_id = request.args.get('user_id')
+    if user_id is None:
+        return 'User id must be provided', 400
+    if user_id not in users_list:
+        return f'User with id {user_id} not found', 404
+    check_user_id_exists(user_id)
+
+    dependents_take_date = request.args.get('date')
+    if dependents_take_date is None:
+        return 'Date must be provided', 400
+    take_date_datetime = datetime.strptime(dependents_take_date, '%Y-%m-%d').date()
+    return flask.jsonify(
+        [{
+            'dependent_profile': profiles_to_json(user_info_to_profile(users_list[profile])),
+            'medicine_takes': [{'medicine': from_medicine_id_to_medicine_id_and_info_json(medicine_id),
+                                'take_status': take_status,
+                                'date': dependents_take_date
+                                }
+                               for medicine_id, take_status in
+                               date_to_medicine_status.get(take_date_datetime, {}).get(profile, {}).items()]
+        }
+            for profile in users_to_dependents[user_id]]
+
     ), 200
 
 

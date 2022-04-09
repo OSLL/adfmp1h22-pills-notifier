@@ -24,8 +24,6 @@ import com.example.pillnotifier.adapters.ProfilesListAdapter
 import com.example.pillnotifier.adapters.holders.*
 import com.example.pillnotifier.model.DataHolder
 import com.example.pillnotifier.model.ProfilesList
-import com.example.pillnotifier.model.RequestResult
-import com.example.pillnotifier.model.ScheduleResult
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

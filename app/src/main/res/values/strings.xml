@@ -42,6 +42,8 @@
     <string name="sign_up">Sign up</string>
     <string name="schedule_failed">"Failed to update schedule"</string>
     <string name="explore_failed">"Failed to update explore"</string>
+    <string name="dependents_failed">"Failed to update dependents"</string>
     <string name="status_update_failed">"Failed to update medicine take status"</string>
     <string name="medicines_failed">"Failed to update medicines list"</string>
+    <string name="select_date">Select Date</string>
 </resources>
