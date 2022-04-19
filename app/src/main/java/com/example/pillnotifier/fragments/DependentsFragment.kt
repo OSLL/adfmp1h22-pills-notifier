@@ -2,6 +2,7 @@ package com.example.pillnotifier.fragments
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -79,7 +80,7 @@ class DependentsFragment : Fragment() {
                 dependents.clear()
                 lifecycleScope.launch {
                     val result: DependentsResult = withContext(Dispatchers.IO) {
-                        getInfoForUpdate(tvDate.toString())
+                        getInfoForUpdate(tvDate.text.toString())
                     }
                     if (result.success != null) {
                         dependents.addAll(result.success)

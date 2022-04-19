@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity() {
                             val httpUrl: HttpUrl? =
                                 (Constants.BASE_URL + "/notification_status").toHttpUrlOrNull()
                             if (httpUrl == null) {
-                                cont.resume(RequestResult(error = R.string.schedule_failed))
+                                cont.resume(RequestResult(error = "Error while fetching notifications: invalid server http url"))
                             }
 
                             val httpUrlBuilder: HttpUrl.Builder = httpUrl!!.newBuilder()
@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
 
                             client.newCall(request).enqueue(object : Callback {
                                 override fun onFailure(call: Call, e: IOException) {
-                                    cont.resume(RequestResult(error = R.string.schedule_failed))
+                                    cont.resume(RequestResult(error = "Failed to update notifications status"))
                                 }
 
                                 override fun onResponse(call: Call, response: Response) {

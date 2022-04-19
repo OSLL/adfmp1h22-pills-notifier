@@ -70,7 +70,7 @@ username_to_uuid: Dict[str, str] = {'test_user': test_user_id,
                                     'john_watson': watson_user_id}
 
 user_to_notifications: Dict[str, List[Notification]] = {
-    test_user_id: [Notification('Kimberly White: Vitamin A not taken', '2022-04-01 15:00')],
+    test_user_id: [],
     snd_user_id: [],
     test_observer_id: [],
     sherlock_user_id: [],
@@ -104,8 +104,10 @@ users_to_outgoing_request: Dict[str, List[str]] = {
 
 # { date : {user: { medicine_id: TakeStatus } } }
 date_to_medicine_status: Dict[date, Dict[str, Dict[str, TakeStatus]]] = {}
-test_medicine_info = medicine_id_to_medicine_info[test_medicine_id_fst]
-for take_date in Regularity.DAILY.take_dates_generator(test_medicine_info.start_date, test_medicine_info.end_date):
+test_medicine_info_fst = medicine_id_to_medicine_info[test_medicine_id_fst]
+test_medicine_info_snd = medicine_id_to_medicine_info[test_medicine_id_snd]
+test_medicine_info_thd = medicine_id_to_medicine_info[test_medicine_id_thd]
+for take_date in Regularity.DAILY.take_dates_generator(test_medicine_info_fst.start_date, test_medicine_info_fst.end_date):
     date_to_medicine_status[take_date] = {test_user_id: {test_medicine_id_fst: TakeStatus.UNKNOWN},
                                           test_user_for_schedule_fragment_id: {test_medicine_id_fst: TakeStatus.UNKNOWN,
                                                                                test_medicine_id_snd: TakeStatus.TAKEN,
@@ -113,6 +115,19 @@ for take_date in Regularity.DAILY.take_dates_generator(test_medicine_info.start_
                                           test_user_for_medicine_fragment_id: {test_medicine_id_fst: TakeStatus.UNKNOWN,
                                                                                test_medicine_id_snd: TakeStatus.UNKNOWN}
                                           }
+
+    user_to_notifications[test_user_id].append(Notification(users_list[test_user_for_schedule_fragment_id].username
+                                                            + ": " + test_medicine_info_snd.medicine_name
+                                                            + " " + TakeStatus.TAKEN.name.lower(),
+                                                            take_date.strftime('%Y-%m-%d') + " " +
+                                                            test_medicine_info_snd.time.strftime('%H:%M')))
+    user_to_notifications[test_user_id].append(Notification(users_list[test_user_for_schedule_fragment_id].username
+                                                            + ": " + test_medicine_info_thd.medicine_name
+                                                            + " " + TakeStatus.NOT_TAKEN.name.lower(),
+                                                            take_date.strftime('%Y-%m-%d') + " " +
+                                                            test_medicine_info_thd.time.strftime('%H:%M')))
+
+user_to_notifications[test_user_id].append(Notification('sherlock_holmes wants to become your observer', ''))
 
 users_to_notification_status: Dict[str, bool] = {
     test_user_id: False,
