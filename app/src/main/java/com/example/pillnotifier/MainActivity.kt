@@ -11,18 +11,33 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.example.pillnotifier.adapters.ViewPagerAdapter
 import com.example.pillnotifier.model.DataHolder
+import com.example.pillnotifier.model.RequestResult
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.*
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import java.io.IOException
+import java.lang.Thread.sleep
+import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.concurrent.thread
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mToggle: ActionBarDrawerToggle
+    private var new_notification = AtomicBoolean(false)
 
     private val activityWithResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -85,6 +100,54 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+
+        thread(start=true, isDaemon = true) {
+            while (true) {
+                sleep(5000)
+                lifecycleScope.launch {
+                    val result: RequestResult = withContext(Dispatchers.IO) {
+                        suspendCoroutine { cont ->
+                            val client = OkHttpClient.Builder().build()
+
+                            val httpUrl: HttpUrl? =
+                                (Constants.BASE_URL + "/notification_status").toHttpUrlOrNull()
+                            if (httpUrl == null) {
+                                cont.resume(RequestResult(error = R.string.schedule_failed))
+                            }
+
+                            val httpUrlBuilder: HttpUrl.Builder = httpUrl!!.newBuilder()
+                            httpUrlBuilder.addQueryParameter(
+                                "user_id",
+                                DataHolder.getData("userId")
+                            )
+
+                            val request: Request = Request.Builder()
+                                .url(httpUrlBuilder.build())
+                                .build()
+
+                            client.newCall(request).enqueue(object : Callback {
+                                override fun onFailure(call: Call, e: IOException) {
+                                    cont.resume(RequestResult(error = R.string.schedule_failed))
+                                }
+
+                                override fun onResponse(call: Call, response: Response) {
+                                    val message: String = response.body!!.string()
+                                    if (response.code == 200) {
+                                        cont.resume(RequestResult(success = message))
+                                    } else {
+                                        onFailure(call, IOException(message))
+                                    }
+                                }
+                            })
+                        }
+                    }
+                    if (result.success != null) {
+                        new_notification.set(Objects.equals("true", result.success))
+                    }
+                }
+                this.invalidateOptionsMenu()
+            }
+        }
     }
 
     @Override
@@ -102,5 +165,22 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.app_bar_menu, menu)
         return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val resId : Int
+        if (new_notification.get()) {
+            resId = resources.getIdentifier(
+                "ic_baseline_notification_important_24", "drawable",
+                packageName
+            )
+        } else {
+            resId = resources.getIdentifier(
+                "baseline_notifications_24", "drawable",
+                packageName
+            )
+        }
+        if (resId != 0) menu.findItem(R.id.notification).setIcon(resId)
+        return true
     }
 }

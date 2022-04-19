@@ -10,6 +10,7 @@ from models.medicine_info import Regularity, MedicineInfo
 from models.profile import Profile
 from models.user_info import UserInfo
 from models.take_status import TakeStatus
+from models.notification import Notification
 
 # create the Flask app
 app = Flask(__name__)
@@ -41,7 +42,11 @@ medicine_id_to_medicine_info: Dict[str, MedicineInfo] = {
 user_to_medicine_ids: Dict[str, List[str]] = {
     test_user_id: [test_medicine_id_fst],
     test_user_for_schedule_fragment_id: [test_medicine_id_fst, test_medicine_id_snd, test_medicine_id_thd],
-    test_user_for_medicine_fragment_id: [test_medicine_id_fst, test_medicine_id_snd]
+    test_user_for_medicine_fragment_id: [test_medicine_id_fst, test_medicine_id_snd],
+    snd_user_id: [],
+    test_observer_id: [],
+    sherlock_user_id: [],
+    watson_user_id: []
 }
 
 users_list: Dict[str, UserInfo] = {test_user_id: UserInfo('test_user', 'test_user', '123456'),
@@ -54,9 +59,7 @@ users_list: Dict[str, UserInfo] = {test_user_id: UserInfo('test_user', 'test_use
                                    test_user_for_explore_fragment_id: UserInfo('test_explore', 'test_explore',
                                                                                '123456'),
                                    sherlock_user_id: UserInfo('Sherlock Holmes', 'sherlock_holmes', '123456'),
-                                   watson_user_id: UserInfo('John Watson', 'john_watson', '123456')
-                                   }
-
+                                   watson_user_id: UserInfo('John Watson', 'john_watson', '123456')}
 username_to_uuid: Dict[str, str] = {'test_user': test_user_id,
                                     'snd_user': snd_user_id,
                                     'test_observer': test_observer_id,
@@ -64,15 +67,40 @@ username_to_uuid: Dict[str, str] = {'test_user': test_user_id,
                                     'test_medicine': test_user_for_medicine_fragment_id,
                                     'test_explore': test_user_for_explore_fragment_id,
                                     'sherlock_holmes': sherlock_user_id,
-                                    'john_watson': watson_user_id
-                                    }
+                                    'john_watson': watson_user_id}
+
+user_to_notifications: Dict[str, List[Notification]] = {
+    test_user_id: [Notification('Kimberly White: Vitamin A not taken', '2022-04-01 15:00')],
+    snd_user_id: [],
+    test_observer_id: [],
+    sherlock_user_id: [],
+    watson_user_id: []
+}
 
 users_to_dependents: Dict[str, List[str]] = {
-    test_user_id: [snd_user_id, test_observer_id, test_user_for_schedule_fragment_id]}
+    test_user_id: [snd_user_id, test_observer_id, test_user_for_schedule_fragment_id],
+    snd_user_id: [],
+    test_observer_id: [],
+    sherlock_user_id: [],
+    watson_user_id: []
+}
 users_to_observers: Dict[str, List[str]] = {snd_user_id: [test_user_id], test_observer_id: [test_user_id],
-                                            test_user_for_schedule_fragment_id: [test_user_id]}
-users_to_incoming_request: Dict[str, List[str]] = {test_user_id: [sherlock_user_id]}
-users_to_outgoing_request: Dict[str, List[str]] = {sherlock_user_id: [test_user_id]}
+                                            test_user_for_schedule_fragment_id: [test_user_id], test_user_id: [],
+                                            sherlock_user_id: [], watson_user_id: []}
+users_to_incoming_request: Dict[str, List[str]] = {
+    test_user_id: [sherlock_user_id],
+    watson_user_id: [test_user_id],
+    snd_user_id: [],
+    test_observer_id: [],
+    sherlock_user_id: []
+}
+users_to_outgoing_request: Dict[str, List[str]] = {
+    sherlock_user_id: [test_user_id],
+    test_user_id: [watson_user_id],
+    snd_user_id: [],
+    test_observer_id: [],
+    watson_user_id: []
+}
 
 # { date : {user: { medicine_id: TakeStatus } } }
 date_to_medicine_status: Dict[date, Dict[str, Dict[str, TakeStatus]]] = {}
@@ -85,6 +113,14 @@ for take_date in Regularity.DAILY.take_dates_generator(test_medicine_info.start_
                                           test_user_for_medicine_fragment_id: {test_medicine_id_fst: TakeStatus.UNKNOWN,
                                                                                test_medicine_id_snd: TakeStatus.UNKNOWN}
                                           }
+
+users_to_notification_status: Dict[str, bool] = {
+    test_user_id: False,
+    snd_user_id: False,
+    test_observer_id: False,
+    sherlock_user_id: False,
+    watson_user_id: False
+}
 
 
 def from_json_to_medicine_info(json_request):
@@ -214,6 +250,29 @@ def get_schedule():
     ), 200
 
 
+@app.route('/notifications', methods=['GET'])
+def get_notifications():
+    user_id = request.args.get('user_id')
+    if user_id is None:
+        return 'User id must be provided', 400
+    if user_id not in users_list:
+        return f'User with id {user_id} not found', 404
+    users_to_notification_status[user_id] = False
+    return flask.jsonify(
+        [{'message': notification.message,
+          'date': notification.date}
+         for notification in user_to_notifications.get(user_id, [])]
+    ), 200
+
+
+@app.route('/notification_status', methods=['GET'])
+def get_notification_status():
+    user_id = request.args.get('user_id')
+    if user_id is None:
+        return 'User id must be provided', 400
+    return str(users_to_notification_status[user_id]).lower(), 200
+
+
 @app.route('/medicine/status', methods=['POST'])
 def add_status():
     content_type = request.headers.get('Content-Type')
@@ -233,6 +292,15 @@ def add_status():
         medicine_date = datetime.strptime(json_request['date'], '%Y-%m-%d').date()
         medicine_id = json_request['medicine_id']
         medicine_status = TakeStatus[json_request['medicine_status']]
+        observers = users_to_observers.get(user_id, [])
+        medicine_name = medicine_id_to_medicine_info[medicine_id].medicine_name
+        username = users_list.get(user_id).username
+        notification_message = username + ": " + medicine_name + " " + medicine_status.name.lower()
+        notification_date = json_request['date'] + " " + medicine_id_to_medicine_info[medicine_id].time.strftime(
+            '%H:%M')
+        for observer_id in observers:
+            user_to_notifications.get(observer_id, []).append(Notification(notification_message, notification_date))
+            users_to_notification_status[observer_id] = True
         date_to_medicine_status[medicine_date][user_id][medicine_id] = medicine_status
         return 'OK', 200
     else:
@@ -248,7 +316,7 @@ def get_medicines():
         return f'User with id {user_id} not found', 404
     return flask.jsonify(
         [from_medicine_id_to_medicine_id_and_info_json(medicine_id)
-         for medicine_id in user_to_medicine_ids[user_id]]
+         for medicine_id in user_to_medicine_ids.get(user_id, [])]
     ), 200
 
 
@@ -282,6 +350,13 @@ def register():
         user_id = str(uuid.uuid4())
         users_list[user_id] = UserInfo(full_name, username, password)
         username_to_uuid[username] = user_id
+        users_to_notification_status[user_id] = False
+        user_to_medicine_ids[user_id] = []
+        user_to_notifications[user_id] = []
+        users_to_incoming_request[user_id] = []
+        users_to_outgoing_request[user_id] = []
+        users_to_observers[user_id] = []
+        users_to_dependents[user_id] = []
         result = {'userId': user_id, 'fullname': full_name, 'username': username}
         return json.dumps(result), 200
     else:
@@ -334,6 +409,9 @@ def dependent_send_request():
         if dependent_id not in users_to_incoming_request:
             users_to_incoming_request[dependent_id] = []
         users_to_incoming_request[dependent_id].append(user_id)
+        notification_message = users_list[user_id].username + " wants to become your observer"
+        user_to_notifications.get(dependent_id, []).append(Notification(notification_message, ""))
+        users_to_notification_status[dependent_id] = True
         return f'Request to {dependent_username} was sent', 200
     else:
         return 'Content-Type not supported!', 404
