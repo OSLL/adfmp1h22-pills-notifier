@@ -78,43 +78,47 @@ class Settings : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
         nameInput = findViewById<View>(R.id.name) as EditText
+        nameInput?.hint = DataHolder.getData("username")
         linkInput = findViewById<View>(R.id.link_edit) as EditText
+        linkInput?.hint = DataHolder.getData("link")
         submitButton = findViewById<View>(R.id.submitButton) as Button
         submitButton!!.setOnClickListener {
             lifecycleScope.launch {
                 val result = withContext(Dispatchers.IO) {
                     name = nameInput?.text.toString()
                     if (name == null || name == "") {
-                        name = DataHolder.getData("fullname")
+                        name = DataHolder.getData("username")
                     }
 
                     link = linkInput?.text.toString()
                     if (link == null || link == "") {
-                        link = DataHolder.getData("username")
+                        link = DataHolder.getData("link")
                     }
                     _updateUserInfo(name, link)
                 }
+                name = nameInput?.text.toString()
+                link = linkInput?.text.toString()
+                val intent = Intent()
                 if (result is Result.Success) {
                     Toast.makeText(
                         applicationContext,
                         "User profile updated",
                         Toast.LENGTH_LONG
                     ).show()
+                    if (name != null && name != "") {
+                        intent.putExtra("username", name)
+                    }
+                    if (link != null && link != "") {
+                        intent.putExtra("link", link)
+                    }
                 } else {
                     Toast.makeText(
                         applicationContext,
                         "Could not update user profile",
                         Toast.LENGTH_LONG
                     ).show()
-                }
-                val intent = Intent()
-                name = nameInput?.text.toString()
-                if (name != null && name != "") {
-                    intent.putExtra("username", name)
-                }
-                link = linkInput?.text.toString()
-                if (link != null && link != "") {
-                    intent.putExtra("link", link)
+                    intent.putExtra("username", DataHolder.getData("username"))
+                    intent.putExtra("link", DataHolder.getData("link"))
                 }
                 setResult(Activity.RESULT_OK, intent)
                 onBackPressed()

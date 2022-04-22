@@ -71,8 +71,8 @@ class LoginActivity : AppCompatActivity() {
 
                 val intent = Intent(this@LoginActivity, MainActivity::class.java)
                 DataHolder.setData("userId", loginResult.success.userId)
-                DataHolder.setData("fullname", loginResult.success.fullname)
-                DataHolder.setData("username", loginResult.success.username)
+                DataHolder.setData("username", loginResult.success.fullname)
+                DataHolder.setData("link", loginResult.success.username)
                 startActivity(intent)
 
                 //Complete and destroy login activity once successful

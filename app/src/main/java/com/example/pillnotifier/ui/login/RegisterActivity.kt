@@ -63,8 +63,8 @@ class RegisterActivity : AppCompatActivity() {
                 updateUiWithUser(registerResult.success)
                 val intent = Intent(this@RegisterActivity, MainActivity::class.java)
                 DataHolder.setData("userId", registerResult.success.userId)
-                DataHolder.setData("fullname", registerResult.success.fullname)
-                DataHolder.setData("username", registerResult.success.username)
+                DataHolder.setData("username", registerResult.success.fullname)
+                DataHolder.setData("link", registerResult.success.username)
                 startActivity(intent)
                 setResult(Activity.RESULT_OK)
                 //Complete and destroy login activity once successful

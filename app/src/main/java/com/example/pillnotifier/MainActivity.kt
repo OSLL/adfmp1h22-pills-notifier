@@ -87,10 +87,10 @@ class MainActivity : AppCompatActivity() {
         val mNavigationView = findViewById<View>(R.id.nav_menu) as NavigationView
         val headerView: View = mNavigationView.getHeaderView(0)
         val username = headerView.findViewById<View>(R.id.username) as TextView
-        username.text = DataHolder.getData("fullname")
+        username.text = DataHolder.getData("username")
 
         val link = headerView.findViewById<View>(R.id.link) as TextView
-        link.text = DataHolder.getData("username")
+        link.text = DataHolder.getData("link")
 
         mNavigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
