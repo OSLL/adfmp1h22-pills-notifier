@@ -138,7 +138,8 @@ class ExploreInstrumentedTest {
                     "Dependents",
                     listOf(
                         Profile("snd_user", "snd_user"),
-                        Profile("test_observer", "test_observer")
+                        Profile("test_observer", "test_observer"),
+                        Profile("test_schedule", "test_schedule")
                     )
                 ),
                 ProfilesList("Observers", listOf()),
@@ -146,7 +147,9 @@ class ExploreInstrumentedTest {
                     "Incoming requests",
                     listOf(Profile("Sherlock Holmes", "sherlock_holmes"))
                 ),
-                ProfilesList("Outgoing requests", listOf())
+                ProfilesList("Outgoing requests", listOf(
+                    Profile("John Watson", "john_watson")
+                ))
             )
         )
     }
@@ -158,7 +161,8 @@ class ExploreInstrumentedTest {
                 "Dependents",
                 listOf(
                     Profile("snd_user", "snd_user"),
-                    Profile("test_observer", "test_observer")
+                    Profile("test_observer", "test_observer"),
+                    Profile("test_schedule", "test_schedule")
                 )
             ),
             ProfilesList("Observers", listOf()),
@@ -166,7 +170,9 @@ class ExploreInstrumentedTest {
                 "Incoming requests",
                 listOf(Profile("Sherlock Holmes", "sherlock_holmes"))
             ),
-            ProfilesList("Outgoing requests", listOf())
+            ProfilesList("Outgoing requests", listOf(
+                Profile("John Watson", "john_watson")
+            ))
         )
         launchFragmentInContainer<ExploreFragment>()
         onView(isRoot()).perform(waitUntilNotShown(R.id.loading, 10000))
@@ -186,7 +192,9 @@ class ExploreInstrumentedTest {
 
         profiles[3] = ProfilesList(
             "Outgoing requests",
-            listOf(Profile("test_explore", "test_explore"))
+            listOf(
+                Profile("John Watson", "john_watson"),
+                Profile("test_explore", "test_explore"))
         )
         checkExploreList(
            profiles
@@ -195,7 +203,7 @@ class ExploreInstrumentedTest {
         onView(withId(R.id.explore_rv)).perform(
             RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(
                 3,
-                clickChildViewOfChildRecycleViewItem(R.id.profiles_lists_rv, 0, R.id.withdraw_button)
+                clickChildViewOfChildRecycleViewItem(R.id.profiles_lists_rv, 1, R.id.withdraw_button)
             )
         )
 
@@ -204,7 +212,9 @@ class ExploreInstrumentedTest {
         closeRecyclerView()
         profiles[3] = ProfilesList(
             "Outgoing requests",
-            listOf()
+            listOf(
+                Profile("John Watson", "john_watson")
+            )
         )
         checkExploreList(
             profiles
