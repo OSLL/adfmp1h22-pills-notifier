@@ -17,9 +17,10 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.pillnotifier.MedicineProfile
 import com.example.pillnotifier.R
-import com.example.pillnotifier.data.deleteMedicine
+import com.example.pillnotifier.cachingMedicineList
 import com.example.pillnotifier.model.DataHolder
 import com.example.pillnotifier.model.Medicine
+import com.example.pillnotifier.model.deleteMedicine
 import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -57,6 +58,7 @@ class MedicineAdapter(
                                 Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()
                             } else {
                                 medicines.removeAt(position)
+                                cachingMedicineList(context, medicines)
                                 notifyDataSetChanged()
                             }
                         }

@@ -32,11 +32,11 @@ test_user_for_explore_fragment_id = "test_explore"
 
 medicine_id_to_medicine_info: Dict[str, MedicineInfo] = {
     test_medicine_id_fst: MedicineInfo("Vitamin A", "1 pill", Regularity.DAILY, date(2022, 1, 1),
-                                       date(2022, 4, 1), time(16)),
+                                       date(2022, 6, 1), time(16)),
     test_medicine_id_snd: MedicineInfo("Vitamin B", "2 pills", Regularity.DAILY, date(2022, 1, 1),
-                                       date(2022, 4, 1), time(13)),
+                                       date(2022, 6, 1), time(13)),
     test_medicine_id_thd: MedicineInfo("Vitamin C", "3 pills", Regularity.DAILY, date(2022, 1, 1),
-                                       date(2022, 4, 1), time(12))
+                                       date(2022, 6, 1), time(12))
 }
 
 user_to_medicine_ids: Dict[str, List[str]] = {
@@ -254,6 +254,22 @@ def get_schedule():
     if take_date is None:
         return 'Date must be provided', 400
     take_date_datetime = datetime.strptime(take_date, '%Y-%m-%d').date()
+    if user_id not in users_list:
+        return f'User with id {user_id} not found', 404
+    return flask.jsonify(
+        [{'medicine': from_medicine_id_to_medicine_id_and_info_json(medicine_id),
+          'take_status': take_status,
+          'date': take_date
+          }
+         for medicine_id, take_status in date_to_medicine_status.get(take_date_datetime, {}).get(user_id, {}).items()]
+    ), 200
+
+
+@app.route('/whole_schedule', methods=['GET'])
+def get_whole_schedule():
+    user_id = request.args.get('user_id')
+    if user_id is None:
+        return 'User id must be provided', 400
     if user_id not in users_list:
         return f'User with id {user_id} not found', 404
     return flask.jsonify(
