@@ -9,13 +9,9 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.example.pillnotifier.data.deleteMedicine
 import com.example.pillnotifier.fragments.DatePickerFragment
 import com.example.pillnotifier.fragments.TimePickerFragment
-import com.example.pillnotifier.model.DataHolder
-import com.example.pillnotifier.model.Medicine
-import com.example.pillnotifier.model.Regularity
-import com.example.pillnotifier.model.RequestResult
+import com.example.pillnotifier.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -95,12 +91,23 @@ class MedicineProfile : AppCompatActivity() {
                         cont.resume(e.message!!)
                     }
 
+                    @RequiresApi(Build.VERSION_CODES.O)
                     override fun onResponse(call: Call, response: Response) {
                         val message: String = response.body!!.string()
                         if (response.code != 200)
                             onFailure(call, IOException(message))
-                        else
+                        else {
+                            cachingNewMedicine(this@MedicineProfile, Medicine(
+                                message,
+                                medicineInput.text.toString(),
+                                portionInput.text.toString(),
+                                takeTime.text.toString(),
+                                Regularity.valueOf(regularitySpinner.selectedItem.toString()),
+                                startDate.text.toString(),
+                                endDate.text.toString()
+                            ))
                             cont.resume(null)
+                        }
                     }
                 })
             }
@@ -171,12 +178,30 @@ class MedicineProfile : AppCompatActivity() {
                         cont.resume(e.message!!)
                     }
 
+                    @RequiresApi(Build.VERSION_CODES.O)
                     override fun onResponse(call: Call, response: Response) {
                         val message: String = response.body!!.string()
                         if (response.code != 200)
                             onFailure(call, IOException(message))
-                        else
-                            cont.resume(null)
+                        else {
+                            val oldMedList = getCachedMedicineList(this@MedicineProfile).toMutableList()
+                            val medIndex = oldMedList.indexOfLast { it.medicine_id == medicineId }
+                            if (medIndex == -1) {
+                                onFailure(call, IOException("Didn't found medicine in cached list"))
+                            } else {
+                                oldMedList[medIndex] = Medicine(
+                                    message,
+                                    medicineInput.text.toString(),
+                                    portionInput.text.toString(),
+                                    takeTime.text.toString(),
+                                    Regularity.valueOf(regularitySpinner.selectedItem.toString()),
+                                    startDate.text.toString(),
+                                    endDate.text.toString()
+                                )
+                                cachingMedicineList(this@MedicineProfile, oldMedList)
+                                cont.resume(null)
+                            }
+                        }
                     }
                 })
             }
@@ -237,16 +262,17 @@ class MedicineProfile : AppCompatActivity() {
             }
         }
 
-        val medicine: Medicine? = intent.extras?.get("medicine") as Medicine?
+
+        val curMedicine: Medicine? = intent.extras?.get("medicine") as Medicine?
         if (mode != Mode.CREATE) {
-            if (medicine == null)
+            if (curMedicine == null)
                 throw RuntimeException("Medicine wasn't passed")
-            medicineInput.setText(medicine.medicine_name ?: "")
-            portionInput.setText(medicine.portion ?: "")
-            regularitySpinner.setSelection(myAdapter.getPosition(medicine.regularity))
-            startDate.text = medicine.start_date
-            endDate.text = medicine.end_date
-            takeTime.text = medicine.time
+            medicineInput.setText(curMedicine!!.medicine_name ?: "")
+            portionInput.setText(curMedicine!!.portion ?: "")
+            regularitySpinner.setSelection(myAdapter.getPosition(curMedicine!!.regularity))
+            startDate.text = curMedicine!!.start_date
+            endDate.text = curMedicine!!.end_date
+            takeTime.text = curMedicine!!.time
 
             if (mode == Mode.READ) {
                 for (view in listOf(
@@ -272,13 +298,13 @@ class MedicineProfile : AppCompatActivity() {
                 }
                 Mode.EDIT -> {
                     lifecycleScope.launch {
-                        if (medicine == null)
+                        if (curMedicine == null)
                             throw RuntimeException("Medicine wasn't passed")
-                        if (medicine.medicine_id == null)
+                        if (curMedicine!!.medicine_id == null)
                             throw RuntimeException("Medicine doesn't contains id")
                         else {
                             loading.visibility = View.VISIBLE
-                            editMedicine(medicine.medicine_id!!)
+                            editMedicine(curMedicine!!.medicine_id!!)
                             loading.visibility = View.GONE
                         }
                     }

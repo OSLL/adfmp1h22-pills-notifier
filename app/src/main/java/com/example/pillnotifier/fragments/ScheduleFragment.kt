@@ -57,49 +57,7 @@ class ScheduleFragment : Fragment() {
             medicineTakeList.clear()
             loading.visibility = View.VISIBLE
             lifecycleScope.launch {
-                val result: ScheduleResult = withContext(Dispatchers.IO) {
-                    suspendCoroutine { cont ->
-                        val client = OkHttpClient.Builder().build()
-
-                        val httpUrl: HttpUrl? = (Constants.BASE_URL + "/schedule").toHttpUrlOrNull()
-                        if (httpUrl == null) {
-                            cont.resume(ScheduleResult(error = requireContext().resources.getString(R.string.schedule_failed)))
-                        }
-
-                        val httpUrlBuilder: HttpUrl.Builder = httpUrl!!.newBuilder()
-                        httpUrlBuilder.addQueryParameter("user_id", DataHolder.getData("userId"))
-                        httpUrlBuilder.addQueryParameter("date", date)
-
-
-                        lateinit var request: Request
-                        try {
-                            request = Request.Builder()
-                            .url(httpUrlBuilder.build())
-                            .build()
-                        } catch (e: IllegalArgumentException) {
-                            cont.resume(ScheduleResult(error = e.message))
-                            return@suspendCoroutine
-                        }
-
-
-                        client.newCall(request).enqueue(object : Callback {
-                            override fun onFailure(call: Call, e: IOException) {
-                                cont.resume(ScheduleResult(error = context!!.resources.getString( R.string.schedule_failed)))
-                            }
-
-                            override fun onResponse(call: Call, response: Response) {
-                                val message: String = response.body!!.string()
-                                val gson = Gson()
-                                if (response.code == 200) {
-                                    val medicineTakeList = gson.fromJson(message, Array<MedicineTake>::class.java).toMutableList()
-                                    cont.resume(ScheduleResult(success = medicineTakeList))
-                                } else {
-                                    onFailure(call, IOException(message))
-                                }
-                            }
-                        })
-                    }
-                }
+                val result: ScheduleResult = getScheduleFromServer(requireContext(), date)
                 if (result.success != null) {
                     medicineTakeList.addAll(result.success)
                     recyclerView.adapter!!.notifyDataSetChanged()

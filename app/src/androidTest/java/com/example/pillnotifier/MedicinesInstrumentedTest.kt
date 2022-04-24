@@ -183,7 +183,7 @@ class MedicinesInstrumentedTest {
         onView(withId(R.id.input_medicine_portion)).check(matches(withText("1 pill")))
         onView(withId(R.id.regularity_spinner)).check(matches(withSpinnerText("DAILY")))
         onView(withId(R.id.tvStartDate)).check(matches(withText("2022-01-01")))
-        onView(withId(R.id.tvEndDate)).check(matches(withText("2022-04-01")))
+        onView(withId(R.id.tvEndDate)).check(matches(withText("2022-06-01")))
         onView(withId(R.id.tvTakeTime)).check(matches(withText("16:00")))
         onView(withId(R.id.submitMedicineButton)).check(matches(withEffectiveVisibility(Visibility.GONE)))
         pressBack()

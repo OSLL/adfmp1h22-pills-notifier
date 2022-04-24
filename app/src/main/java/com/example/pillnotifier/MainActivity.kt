@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.example.pillnotifier.adapters.ViewPagerAdapter
 import com.example.pillnotifier.model.DataHolder
 import com.example.pillnotifier.model.RequestResult
@@ -27,6 +29,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.io.IOException
 import java.lang.Thread.sleep
 import java.util.*
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.coroutines.resume
@@ -55,7 +58,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -65,8 +67,7 @@ class MainActivity : AppCompatActivity() {
         val viewPagerAdapter = ViewPagerAdapter(supportFragmentManager, lifecycle)
         viewPager2.adapter = viewPagerAdapter
 
-        TabLayoutMediator(tabLayout, viewPager2) {
-            tab, position ->
+        TabLayoutMediator(tabLayout, viewPager2) { tab, position ->
             val iconId = when (position) {
                 0 -> R.drawable.dependents_icon
                 1 -> R.drawable.schedulte_icon
@@ -101,7 +102,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        thread(start=true, isDaemon = true) {
+        thread(start = true, isDaemon = true) {
             while (true) {
                 sleep(5000)
                 lifecycleScope.launch {
@@ -148,6 +149,13 @@ class MainActivity : AppCompatActivity() {
                 this.invalidateOptionsMenu()
             }
         }
+
+        cachingCurrentUserId(this)
+        WorkManager.getInstance(this).cancelAllWorkByTag(NotificationWorker.NOTIFY_WORK_TAG)
+        val myWorkRequest = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
+            .setInitialDelay(20, TimeUnit.SECONDS)
+            .addTag(NotificationWorker.NOTIFY_WORK_TAG).build()
+        WorkManager.getInstance(this).enqueue(myWorkRequest)
     }
 
     @Override
@@ -168,7 +176,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val resId : Int
+        val resId: Int
         if (new_notification.get()) {
             resId = resources.getIdentifier(
                 "ic_baseline_notification_important_24", "drawable",

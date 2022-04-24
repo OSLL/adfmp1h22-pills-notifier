@@ -32,11 +32,11 @@ test_user_for_explore_fragment_id = "test_explore"
 
 medicine_id_to_medicine_info: Dict[str, MedicineInfo] = {
     test_medicine_id_fst: MedicineInfo("Vitamin A", "1 pill", Regularity.DAILY, date(2022, 1, 1),
-                                       date(2022, 4, 1), time(16)),
+                                       date(2022, 6, 1), time(16)),
     test_medicine_id_snd: MedicineInfo("Vitamin B", "2 pills", Regularity.DAILY, date(2022, 1, 1),
-                                       date(2022, 4, 1), time(13)),
+                                       date(2022, 6, 1), time(13)),
     test_medicine_id_thd: MedicineInfo("Vitamin C", "3 pills", Regularity.DAILY, date(2022, 1, 1),
-                                       date(2022, 4, 1), time(12))
+                                       date(2022, 6, 1), time(12))
 }
 
 user_to_medicine_ids: Dict[str, List[str]] = {
