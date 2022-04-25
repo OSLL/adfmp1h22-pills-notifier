@@ -10,4 +10,7 @@ public class DataHolder {
     public static void setData(String key, String value) {
         data.put(key, value);
     }
+    public static void removeData(String key) {
+        data.remove(key);
+    }
 }

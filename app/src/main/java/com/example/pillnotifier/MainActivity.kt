@@ -18,6 +18,7 @@ import androidx.work.WorkManager
 import com.example.pillnotifier.adapters.ViewPagerAdapter
 import com.example.pillnotifier.model.DataHolder
 import com.example.pillnotifier.model.RequestResult
+import com.example.pillnotifier.ui.login.LoginActivity
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -97,6 +98,11 @@ class MainActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 R.id.edit_profile -> {
                     activityWithResult.launch(Intent(applicationContext, Settings::class.java))
+                }
+                R.id.logout -> {
+                    DataHolder.removeData("userId")
+                    val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                    startActivity(intent)
                 }
             }
             true

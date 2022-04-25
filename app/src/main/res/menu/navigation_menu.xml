@@ -3,4 +3,7 @@
     <item android:id="@+id/edit_profile"
         android:title="Edit Profile"
         android:icon="@mipmap/baseline_manage_accounts_black_48"/>
+    <item android:id="@+id/logout"
+        android:title="Logout"
+        android:icon="@drawable/logout"/>
 </menu>
