@@ -52,7 +52,7 @@ class MedicineAdapter(
                         DialogInterface.BUTTON_POSITIVE -> {
                             var errorMsg: String? = null
                             GlobalScope.launch {
-                                errorMsg = deleteMedicine(DataHolder.getData("userId"), medicine.medicine_id!!)
+                                errorMsg = deleteMedicine(DataHolder.getData("userId")!!, medicine.medicine_id!!)
                             }
                             if (errorMsg != null) {
                                 Toast.makeText(context, errorMsg, Toast.LENGTH_SHORT).show()

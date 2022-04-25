@@ -12,6 +12,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.example.pillnotifier.model.DataHolder
+import com.example.pillnotifier.model.DataHolder.uploadFromCache
 import com.example.pillnotifier.model.Medicine
 import com.example.pillnotifier.model.getMedicineListFromServer
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -70,7 +71,6 @@ class NotificationWorker(
     }
 
     private suspend fun updateCash() {
-        DataHolder.setData("userId", getCachedUserId(context))
         val res = getMedicineListFromServer(context)
         if (res.success != null) {
             cachingMedicineList(context, res.success)
@@ -79,6 +79,12 @@ class NotificationWorker(
 
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun doWork(): Result {
+        // check if user logged in
+        if (DataHolder.getData("userId") == null) {
+            DataHolder.uploadFromCache(context)
+            if (DataHolder.getData("userId") == null)
+                return Result.success()
+        }
         // update cache
         updateCash()
         val nowTime = LocalDateTime.now()

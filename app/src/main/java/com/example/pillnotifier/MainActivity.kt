@@ -49,12 +49,12 @@ class MainActivity : AppCompatActivity() {
                 if (result.data?.hasExtra("username") == true) {
                     val username = findViewById<View>(R.id.username) as TextView
                     username.text = result.data!!.extras?.getString("username")
-                    DataHolder.setData("username", result.data!!.extras?.getString("username"))
+                    DataHolder.setData("username", result.data!!.extras?.getString("username")!!)
                 }
                 if (result.data?.hasExtra("link") == true) {
                     val link = findViewById<View>(R.id.link) as TextView
                     link.text = result.data!!.extras?.getString("link")
-                    DataHolder.setData("link", result.data!!.extras?.getString("link"))
+                    DataHolder.setData("link", result.data!!.extras?.getString("link")!!)
                 }
             }
         }
@@ -101,6 +101,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.logout -> {
                     DataHolder.removeData("userId")
+                    DataHolder.cache(this)
+                    cachingMedicineList(this, listOf())
                     val intent = Intent(this@MainActivity, LoginActivity::class.java)
                     startActivity(intent)
                 }
@@ -156,7 +158,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        cachingCurrentUserId(this)
+        DataHolder.cache(this)
         WorkManager.getInstance(this).cancelAllWorkByTag(NotificationWorker.NOTIFY_WORK_TAG)
         val myWorkRequest = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
             .setInitialDelay(20, TimeUnit.SECONDS)

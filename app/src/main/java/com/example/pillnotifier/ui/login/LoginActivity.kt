@@ -21,6 +21,7 @@ import kotlinx.android.synthetic.main.fragment_explore.*
 
 import com.example.pillnotifier.R
 import com.example.pillnotifier.model.DataHolder
+import com.example.pillnotifier.model.DataHolder.uploadFromCache
 
 class LoginActivity : AppCompatActivity() {
 
@@ -29,6 +30,14 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        DataHolder.uploadFromCache(this)
+        if (DataHolder.getData("userId") != null) {
+            setResult(Activity.RESULT_OK)
+            val intent = Intent(this@LoginActivity, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
