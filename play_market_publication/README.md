@@ -14,6 +14,7 @@
 - Пользовательский интерфейс для родственников и друзей
 - Хранение статистики прошлых приемов
 # Иконка
+![icon](pill_minder_icon_v2-playstore.png)
 # Feature Graphic
 ![feature_graphic](PillMinder%20%20-%20Feature%20Graphic.png)
 # Скриншоты
