@@ -10,9 +10,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/pill_minder_icon"
+        android:icon="@mipmap/pill_minder_icon_v2"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/pill_minder_icon_round"
+        android:roundIcon="@mipmap/pill_minder_icon_v2_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.PillNotifier">
