@@ -8,6 +8,7 @@ import android.widget.DatePicker
 import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.DialogFragment
+import java.text.DateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -33,7 +34,11 @@ class DatePickerFragment(private val tvDate: TextView) : DialogFragment(), DateP
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onDateSet(p0: DatePicker?, y: Int, m: Int, d: Int) {
         tvDate.text = LocalDate.of(y, m + 1, d)
-            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd")).toString()
+            .format(dateFormat).toString()
     }
 
+    companion object {
+        @RequiresApi(Build.VERSION_CODES.O)
+        val dateFormat: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
+    }
 }

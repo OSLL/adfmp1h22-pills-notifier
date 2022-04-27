@@ -40,6 +40,7 @@
         <activity
             android:name=".Settings"
             android:exported="false"
+            android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.login.LoginActivity"

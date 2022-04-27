@@ -28,10 +28,11 @@
             android:background="?attr/colorPrimary"
             android:contentDescription="@string/hello_blank_fragment"
             app:tabGravity="fill"
-            app:tabIndicatorColor="@color/white"
             app:tabIconTint="@color/white"
+            app:tabIndicatorColor="@color/white"
             app:tabMode="fixed"
-            app:tabTextColor="?attr/colorOnPrimary" />
+            app:tabTextColor="?attr/colorOnPrimary"
+            app:tabTextAppearance="@style/MyCustomTabText"/>
 
     </RelativeLayout>
 

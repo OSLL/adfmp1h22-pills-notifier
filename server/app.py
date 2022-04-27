@@ -392,11 +392,11 @@ def update():
         if user_id not in users_list:
             return f'No user with id {user_id}', 404
         user = users_list[user_id]
+        username_to_uuid.pop(user.username)
+        username_to_uuid[username] = user_id
         user.username = username
         user.fullname = full_name
         users_list[user_id] = user
-        username_to_uuid.pop(username)
-        username_to_uuid[username] = user_id
         return 'OK', 200
     else:
         return 'Content-Type not supported!', 404
@@ -603,7 +603,8 @@ def get_dependents():
                                for medicine_id, take_status in
                                date_to_medicine_status.get(take_date_datetime, {}).get(profile, {}).items()]
         }
-            for profile in users_to_dependents[user_id]]
+            for profile in users_to_dependents[user_id]
+            if len(date_to_medicine_status.get(take_date_datetime, {}).get(profile, {}).items()) > 0]
 
     ), 200
 

@@ -29,8 +29,8 @@ class Settings : AppCompatActivity() {
     var name: String? = null
     private var link: String? = null
 
-    private var nameInput: EditText? = null
-    private var linkInput: EditText? = null
+    private lateinit var nameInput: EditText
+    private lateinit var linkInput: EditText
 
     private var submitButton: Button? = null
 
@@ -77,10 +77,10 @@ class Settings : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
-        nameInput = findViewById<View>(R.id.name) as EditText
-        nameInput?.hint = DataHolder.getData("username")
-        linkInput = findViewById<View>(R.id.link_edit) as EditText
-        linkInput?.hint = DataHolder.getData("link")
+        nameInput = findViewById(R.id.name)
+        nameInput.setText(DataHolder.getData("username"))
+        linkInput = findViewById(R.id.link_edit)
+        linkInput.setText(DataHolder.getData("link"))
         submitButton = findViewById<View>(R.id.submitButton) as Button
         submitButton!!.setOnClickListener {
             lifecycleScope.launch {

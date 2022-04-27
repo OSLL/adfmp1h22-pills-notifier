@@ -3,6 +3,8 @@ package com.example.pillnotifier
 import android.app.Activity
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
@@ -23,6 +25,7 @@ import org.json.JSONObject
 import java.io.IOException
 import java.lang.IllegalArgumentException
 import java.lang.RuntimeException
+import java.time.LocalDate
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -78,9 +81,9 @@ class MedicineProfile : AppCompatActivity() {
                 lateinit var request: Request
                 try {
                     request = Request.Builder()
-                    .url(httpUrlBuilder.build())
-                    .post(body)
-                    .build()
+                        .url(httpUrlBuilder.build())
+                        .post(body)
+                        .build()
                 } catch (e: IllegalArgumentException) {
                     cont.resume(e.message!!)
                     return@suspendCoroutine
@@ -97,15 +100,17 @@ class MedicineProfile : AppCompatActivity() {
                         if (response.code != 200)
                             onFailure(call, IOException(message))
                         else {
-                            cachingNewMedicine(this@MedicineProfile, Medicine(
-                                message,
-                                medicineInput.text.toString(),
-                                portionInput.text.toString(),
-                                takeTime.text.toString(),
-                                Regularity.valueOf(regularitySpinner.selectedItem.toString()),
-                                startDate.text.toString(),
-                                endDate.text.toString()
-                            ))
+                            cachingNewMedicine(
+                                this@MedicineProfile, Medicine(
+                                    message,
+                                    medicineInput.text.toString(),
+                                    portionInput.text.toString(),
+                                    takeTime.text.toString(),
+                                    Regularity.valueOf(regularitySpinner.selectedItem.toString()),
+                                    startDate.text.toString(),
+                                    endDate.text.toString()
+                                )
+                            )
                             cont.resume(null)
                         }
                     }
@@ -165,9 +170,9 @@ class MedicineProfile : AppCompatActivity() {
                 lateinit var request: Request
                 try {
                     request = Request.Builder()
-                    .url(httpUrlBuilder.build())
-                    .put(body)
-                    .build()
+                        .url(httpUrlBuilder.build())
+                        .put(body)
+                        .build()
                 } catch (e: IllegalArgumentException) {
                     cont.resume(e.message!!)
                     return@suspendCoroutine
@@ -184,7 +189,8 @@ class MedicineProfile : AppCompatActivity() {
                         if (response.code != 200)
                             onFailure(call, IOException(message))
                         else {
-                            val oldMedList = getCachedMedicineList(this@MedicineProfile).toMutableList()
+                            val oldMedList =
+                                getCachedMedicineList(this@MedicineProfile).toMutableList()
                             val medIndex = oldMedList.indexOfLast { it.medicine_id == medicineId }
                             if (medIndex == -1) {
                                 onFailure(call, IOException("Didn't found medicine in cached list"))
@@ -250,11 +256,75 @@ class MedicineProfile : AppCompatActivity() {
                 val newFragment = DatePickerFragment(startDate)
                 newFragment.show(supportFragmentManager, "Start date picker")
             }
+            startDate.addTextChangedListener(object : TextWatcher {
+                lateinit var prevStartDateText: String
+                var counter = 0
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    if (counter == 0) {
+                        prevStartDateText = p0.toString()
+                    }
+                    counter++
+                }
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                override fun afterTextChanged(p0: Editable?) {
+                    if (counter == 1 && !endDate.text.startsWith("Select") && startDate.text != prevStartDateText) {
+                        val start = LocalDate.parse(
+                            startDate.text,
+                            DatePickerFragment.dateFormat
+                        )
+                        val end = LocalDate.parse(
+                            endDate.text,
+                            DatePickerFragment.dateFormat
+                        )
+                        if (start > end) {
+                            startDate.text = prevStartDateText
+                            Toast.makeText(
+                                this@MedicineProfile,
+                                "Start mustn't be later than end",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                    counter--
+                }
+            })
 
             endDate.setOnClickListener {
                 val newFragment = DatePickerFragment(endDate)
                 newFragment.show(supportFragmentManager, "End date picker")
             }
+            endDate.addTextChangedListener(object : TextWatcher {
+                lateinit var prevEndDataText: String
+                var counter = 0
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    if (counter == 0) {
+                        prevEndDataText = p0.toString()
+                    }
+                    counter++
+                }
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                override fun afterTextChanged(p0: Editable?) {
+                    if (counter == 1 && !startDate.text.startsWith("Select") && endDate.text != prevEndDataText) {
+                        val start = LocalDate.parse(
+                            startDate.text,
+                            DatePickerFragment.dateFormat
+                        )
+                        val end = LocalDate.parse(
+                            endDate.text,
+                            DatePickerFragment.dateFormat
+                        )
+                        if (end < start) {
+                            endDate.text = prevEndDataText
+                            Toast.makeText(
+                                this@MedicineProfile,
+                                "End mustn't be earlier than start",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                    counter--
+                }
+            })
 
             takeTime.setOnClickListener {
                 val newFragment = TimePickerFragment(takeTime)

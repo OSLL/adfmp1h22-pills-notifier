@@ -76,7 +76,15 @@ class MainActivity : AppCompatActivity() {
                 3 -> R.drawable.explore_icon
                 else -> -1
             }
+            val contentDescription = when (position) {
+                0 -> "dependents"
+                1 -> "schedule"
+                2 -> "medicine"
+                3 -> "explore"
+                else -> ""
+            }
             tab.setIcon(iconId)
+            tab.text = contentDescription
         }.attach()
 
         mDrawerLayout = findViewById(R.id.drawerLayout)
